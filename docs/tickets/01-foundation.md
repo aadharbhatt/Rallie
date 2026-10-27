@@ -1,0 +1,188 @@
+# Foundation — non-screen support tickets
+
+Source requirements: [implementation backlog](../IMPLEMENTATION.md); interaction requirements: [design](../DESIGN.md), especially §§4–6 and 14. This is a decomposition, not replacement of the 80 parent requirements. All parent acceptance criteria and binding contracts remain mandatory. No scaffolding is completion evidence. Only these support concerns belong here; visible shell work is tracked separately.
+
+## Parent mapping and delivery rules
+
+- RAL-001 → FND-001–FND-003.
+- RAL-002 → FND-004–FND-007.
+- RAL-003 → FND-002, FND-009, FND-012; visible shell is a separate handoff.
+- RAL-004 → FND-003, FND-008, FND-010.
+- RAL-005 → FND-011–FND-012.
+- RAL-006 → FND-013–FND-014.
+
+Each ticket is intended as one independently verifiable increment, normally no more than half a day once its prerequisites exist. Split further if discovery exceeds that limit. API additions are proposed contracts to finalize with fixtures; do not silently replace parent paths. `Parent gate RAL-xxx` means the parent's required evidence is accepted, not merely that scaffolding exists. Record commit, commands/results, limitations and screenshots where relevant before any future status change. Credentials and resource identifiers must not enter evidence. Production deployment is independent of the runnable local gate.
+
+## Support area: typed bootstrap and migration runner (not a screen)
+
+### FND-001 — Enforce browser, Worker and shared-package boundaries
+- **Status:** TODO
+- **Owner:** unassigned
+- **Parents:** RAL-001 ([requirement](../IMPLEMENTATION.md#ral-001--establish-the-typed-monorepo-and-architectural-boundaries)).
+- **Depends on:** None.
+- **UI checklist:** [ ] Minimal web entry has a heading, keyboard-visible focus and readable failure surface; no domain screen implementation.
+- **API/backend checklist:** [ ] Typecheck React/TypeScript/Vite, Worker, domain and API-contract packages separately; choose Drizzle or thin typed SQL plus schema validation; reserve bridge packages without implementing them.
+- **DB checklist:** [ ] Document migration ownership only; introduce no catalogue, quotation or Tally tables.
+- **Verify:** 1. Build/typecheck a clean checkout: boundaries pass. 2. Deliberately import server bindings into the web: boundary check fails; inspect output for secrets.
+- **Evidence:** pending.
+
+### FND-002 — Define machine-readable health and safe error contracts
+- **Status:** TODO
+- **Owner:** unassigned
+- **Parents:** RAL-001, RAL-003 ([requirements](../IMPLEMENTATION.md)).
+- **Depends on:** FND-001.
+- **UI checklist:** [ ] Document how the shell distinguishes unavailable API from an invalid response, without showing stacks.
+- **API/backend checklist:** [ ] Define `GET /health` service/build/readiness DTO and a stable JSON error envelope; distinguish shallow liveness from dependency readiness; specify status codes and non-secret diagnostic categories.
+- **DB checklist:** None; contract definition must not require domain tables.
+- **Verify:** 1. Validate healthy/unready/error fixtures against shared schemas. 2. Assert fixtures contain no credentials, account/resource IDs or exception stacks.
+- **Evidence:** pending.
+
+### FND-003 — Replay foundation migrations safely
+- **Status:** TODO
+- **Owner:** unassigned
+- **Parents:** RAL-001, RAL-004 ([requirements](../IMPLEMENTATION.md)).
+- **Depends on:** FND-001.
+- **UI checklist:** None; migration commands are non-screen support.
+- **API/backend checklist:** [ ] Provide explicit environment selection and migration-version reporting; reject implicit production reset/seed operations.
+- **DB checklist:** [ ] Establish migration runner/version tracking; replay empty local D1 and forward-upgrade a prior foundation state; deterministic seeds allowed only in dev/test.
+- **Verify:** 1. Apply twice to an empty isolated D1: second run is harmless. 2. Exercise reset/seed protection with a production configuration: refuse before any write.
+- **Evidence:** pending.
+
+## Support area: reproducible local Cloudflare runtime (not a screen)
+
+### FND-004 — Start local web and Worker through development containers
+- **Status:** TODO
+- **Owner:** unassigned
+- **Parents:** RAL-002 ([requirement](../IMPLEMENTATION.md)).
+- **Depends on:** FND-001, FND-002, FND-003.
+- **UI checklist:** [ ] Browser can reach the minimal web entry and a truthful development indicator.
+- **API/backend checklist:** [ ] Document lockfile/runtime prerequisites, startup and health probes using Wrangler/Miniflare-compatible bindings; Docker remains local-only, not production architecture.
+- **DB checklist:** [ ] Bind local D1 through the emulator, not an unrelated SQLite or in-memory substitute.
+- **Verify:** 1. Follow clean-machine startup instructions: web and API respond. 2. Stop the API: web reports service unavailable instead of simulated success.
+- **Evidence:** pending.
+
+### FND-005 — Preserve D1 and private R2 across local restarts
+- **Status:** TODO
+- **Owner:** unassigned
+- **Parents:** RAL-002 ([requirement](../IMPLEMENTATION.md)).
+- **Depends on:** FND-004.
+- **UI checklist:** None; inspect through smoke assertions rather than a new management screen.
+- **API/backend checklist:** [ ] Use local-only binding probes to write/read a harmless fixture object; document restart and explicitly destructive local reset.
+- **DB checklist:** [ ] Persist emulator state in development volumes; reset targets cannot point at staging/production resources.
+- **Verify:** 1. Restart containers: D1 fixture and R2 object survive. 2. Explicitly reset only the test volume: fixtures disappear and migrations restore clean state.
+- **Evidence:** pending.
+
+### FND-006 — Exercise local Workflow and Durable Object bindings
+- **Status:** TODO
+- **Owner:** unassigned
+- **Parents:** RAL-002 ([requirement](../IMPLEMENTATION.md)).
+- **Depends on:** FND-004.
+- **UI checklist:** None; no processing, bridge or Tally screen is implied by smoke success.
+- **API/backend checklist:** [ ] Execute one isolated Workflow smoke and one Durable Object request through real emulator bindings; keep probes dev/test-only and document emulator limits.
+- **DB checklist:** None; no ingestion/job/bridge schema in foundation.
+- **Verify:** 1. Observe Workflow completion and deterministic DO response. 2. Remove each binding in turn: smoke fails explicitly, with no silent fake fallback.
+- **Evidence:** pending.
+
+### FND-007 — Make mock-service opt-in explicit and isolated
+- **Status:** TODO
+- **Owner:** unassigned
+- **Parents:** RAL-002 ([requirement](../IMPLEMENTATION.md)).
+- **Depends on:** FND-004.
+- **UI checklist:** [ ] Development mock labels are readable by assistive technology; unavailable service has explicit copy.
+- **API/backend checklist:** [ ] Independent extraction/Tally mock flags default off; opt-in interfaces cannot consume live credentials; production rejects either flag, without implementing those services.
+- **DB checklist:** None; flags add no domain persistence.
+- **Verify:** 1. Default startup and service failure never activate mocks. 2. Toggle each flag independently and inspect visible labels; production configuration fails closed.
+- **Evidence:** pending.
+
+## Support area: environment and health isolation (not a screen)
+
+### FND-008 — Validate separate environment bindings and origins
+- **Status:** TODO
+- **Owner:** unassigned
+- **Parents:** RAL-004 ([requirement](../IMPLEMENTATION.md)).
+- **Depends on:** FND-004, FND-007.
+- **UI checklist:** [ ] Specify nonproduction banner and distinct unprovisioned/unhealthy messages for the shell.
+- **API/backend checklist:** [ ] Validate dev/staging/prod binding and origin matrix, narrow CORS, required secrets and production mock prohibition; local defaults cannot use production resources.
+- **DB checklist:** [ ] Reject reuse of database/bucket bindings across environments; store actual resource IDs outside public evidence.
+- **Verify:** 1. Test a valid matrix and deliberately shared binding: latter fails. 2. Missing secrets return actionable setup status without attempted deployment or secret disclosure.
+- **Evidence:** pending.
+
+### FND-009 — Serve safe liveness and dependency readiness
+- **Status:** TODO
+- **Owner:** unassigned
+- **Parents:** RAL-003 ([requirement](../IMPLEMENTATION.md)).
+- **Depends on:** FND-002, FND-004, FND-008.
+- **UI checklist:** [ ] Health failure copy distinguishes unavailable backend from a failed domain action; no working-looking domain placeholders.
+- **API/backend checklist:** [ ] Implement `GET /health` against agreed schema; readiness uses bounded safe binding checks, liveness does not mutate data; unexpected errors retain JSON envelope.
+- **DB checklist:** [ ] Minimal readiness query only; no domain migrations or sensitive query results.
+- **Verify:** 1. Healthy service returns machine-readable success. 2. Disconnect a binding: readiness becomes unready without leaking stack/resource identifiers; liveness semantics remain as specified.
+- **Evidence:** pending.
+
+### FND-010 — Document forward migration and recovery safeguards
+- **Status:** TODO
+- **Owner:** unassigned
+- **Parents:** RAL-004 ([requirement](../IMPLEMENTATION.md)).
+- **Depends on:** FND-003, FND-008.
+- **UI checklist:** None; operator recovery is non-screen support.
+- **API/backend checklist:** [ ] Define compatibility ordering, recovery-point prerequisite and operator approval before destructive changes; no generic database abstraction or speculative services.
+- **DB checklist:** [ ] Record empty replay, forward upgrade and backup/restore rehearsal against disposable state; prohibit production test seeds and destructive reset.
+- **Verify:** 1. Rehearse forward upgrade and restore on disposable D1: expected versions/data return. 2. Review runbook with an intentionally missing recovery point: destructive step is blocked.
+- **Evidence:** pending.
+
+## Support area: local gate and credential-gated deployment (not a screen)
+
+### FND-011 — Run deterministic checks in untrusted CI
+- **Status:** TODO
+- **Owner:** unassigned
+- **Parents:** RAL-005 ([requirement](../IMPLEMENTATION.md)).
+- **Depends on:** FND-003, FND-009.
+- **UI checklist:** None; browser interaction checks are separated into FND-012.
+- **API/backend checklist:** [ ] Lockfile install, lint, typecheck, Vitest, production build and secret scan run on clean checkout; forks receive no deployment secrets; live integrations report skipped, not passed.
+- **DB checklist:** [ ] CI provisions isolated local D1 and replays only the currently owned slice migrations.
+- **Verify:** 1. Clean-checkout CI passes with recorded outputs. 2. Introduce a contract mismatch and a fake secret fixture: their respective checks fail without printing real secrets.
+- **Evidence:** pending.
+
+### FND-012 — Record the runnable local foundation gate
+- **Status:** TODO
+- **Owner:** unassigned
+- **Parents:** RAL-003, RAL-005 ([requirements](../IMPLEMENTATION.md)).
+- **Depends on:** FND-005, FND-006, FND-010, FND-011; shell browser acceptance supplied under RAL-003, not a circular completed-parent prerequisite.
+- **UI checklist:** [ ] Playwright asserts loading/error boundary, skip link, focus, responsive navigation and honest placeholders; manually inspect keyboard route flow.
+- **API/backend checklist:** [ ] Test SPA deep links separately from `/api/*` failures: API errors must never be HTML; collect all four emulator binding results.
+- **DB checklist:** [ ] Include isolated foundation replay and persistence assertions, not future schema.
+- **Verify:** 1. Clean container startup plus browser suite pass. 2. Fault API/chunk loading: retry and focus remain usable; report unavailable live integrations separately.
+- **Evidence:** pending.
+
+### FND-013 — Block deployment until trusted provisioning exists
+- **Status:** TODO
+- **Owner:** unassigned
+- **Parents:** RAL-006 ([requirement](../IMPLEMENTATION.md)).
+- **Depends on:** FND-008, FND-011, FND-012.
+- **UI checklist:** [ ] Pipeline distinguishes skipped-unprovisioned, failed and successful deployment.
+- **API/backend checklist:** [ ] Main-only deploy gate checks D1/R2/Workflow/DO provisioning, least-privilege stored token and protected production approval; no repeated unauthenticated attempts.
+- **DB checklist:** [ ] Verify intended migration target/version and recovery point before allowing deploy.
+- **Verify:** 1. Run without credentials: build/tests still pass and deploy explicitly skips/blocks. 2. Fork and production-mock configurations cannot access deploy credentials or deploy.
+- **Evidence:** pending.
+
+### FND-014 — Deploy one assets-and-Worker unit and smoke it
+- **Status:** TODO
+- **Owner:** unassigned
+- **Parents:** RAL-006 ([requirement](../IMPLEMENTATION.md)).
+- **Depends on:** FND-010, FND-013; provisioned protected environment and credentials required.
+- **UI checklist:** [ ] Deployed shell supports keyboard navigation and deep links identically to local.
+- **API/backend checklist:** [ ] Deploy React assets and Worker together after trusted checks; verify live `/health`, origin controls and recovery procedure; unavailable live access becomes BLOCKED, never DONE.
+- **DB checklist:** [ ] Apply intended environment migrations before dependent traffic; record version and protected recovery point.
+- **Verify:** 1. Authorized main commit deploys and live browser/health smoke pass. 2. Rehearse failure/recovery without crossing environment bindings; retain deployment/migration identifiers securely.
+- **Evidence:** pending.
+
+## Support-area completion checklist
+
+- [ ] Typed bootstrap: FND-001–FND-003 verified; no premature domain schema or browser secrets.
+- [ ] Local runtime: FND-004–FND-007 verified against all four emulated bindings, with limitations stated.
+- [ ] Environment/health: FND-008–FND-010 verified, including failure and migration recovery paths.
+- [ ] Local gate: FND-011–FND-012 plus visible shell acceptance under RAL-003 accepted; no production claim inferred.
+- [ ] Deployment: FND-013–FND-014 separately evidenced or explicitly blocked; no skipped deployment counted as live success.
+
+## Suggested implementation order
+
+FND-001 → FND-002/FND-003 → FND-004 → FND-005/FND-006/FND-007 → FND-008/FND-009/FND-010 → FND-011 → FND-012. Coordinate shell acceptance before closing RAL-005. Provisioning and FND-013/FND-014 follow separately; identity may proceed after the local RAL-005 gate without pretending RAL-006 is complete.

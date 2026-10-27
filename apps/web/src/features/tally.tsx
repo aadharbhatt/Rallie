@@ -1,0 +1,6 @@
+import { Cable, CircleDashed, LockKeyhole, RefreshCw } from 'lucide-react';
+import { PageHeader } from '../components/route-feedback';
+
+export function Component() {
+  return <><PageHeader eyebrow="ONE LESS GAP, EVENTUALLY" title="Tally" description="A dedicated place for your future accounting connection." /><section className="integration-panel"><span className="integration-icon"><Cable size={34} aria-hidden="true" /></span><span className="pill neutral">Not implemented</span><h2>The bridge comes later.</h2><p>This foundation does not connect to Tally, run an agent, read inventory, or send vouchers. Nothing is syncing in the background.</p><div className="integration-steps"><div><LockKeyhole size={21} aria-hidden="true" /><h3>Identity first</h3><p>Authenticated business membership is required before pairing.</p></div><div><Cable size={21} aria-hidden="true" /><h3>A local bridge</h3><p>A future agent will connect an authorised Tally installation.</p></div><div><RefreshCw size={21} aria-hidden="true" /><h3>Verified sync</h3><p>Idempotent jobs and explicit status belong to a later vertical slice.</p></div></div><p className="integration-footnote"><CircleDashed size={16} aria-hidden="true" /> A Durable Object binding contract is not a live Tally connection.</p></section></>;
+}

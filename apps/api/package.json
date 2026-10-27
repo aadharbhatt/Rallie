@@ -1,0 +1,7 @@
+{
+  "name": "@rallie/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "devDependencies": { "@cloudflare/workers-types": "^4.20250401.0" }
+}

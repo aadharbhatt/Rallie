@@ -15,8 +15,8 @@ export function RouteError() {
   </main>;
 }
 
-export function PageHeader({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
-  return <header className="page-heading"><p className="eyebrow">{eyebrow}</p><h1>{title}</h1><p>{description}</p></header>;
+export function PageHeader({ title, description }: { eyebrow?: string; title: string; description: string }) {
+  return <header className="page-heading"><h1>{title}</h1><p>{description}</p></header>;
 }
 
 export function BackToDashboard() { return <Link className="button primary" to="/">Back to dashboard</Link>; }

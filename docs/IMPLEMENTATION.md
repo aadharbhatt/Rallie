@@ -2,6 +2,14 @@
 
 Source of truth: [rallie-init.md](../rallie-init.md). Prepared 2026-10-28. This is an actionable implementation plan, not evidence that any feature exists. Source citation placeholders refer to research not supplied in this workspace; verify provider documentation and quotas before deployment.
 
+## Desktop workspace update — 28 October 2026
+
+The preview follows the supplied AI Studio blueprint in [WORKSPACE-UX.md](WORKSPACE-UX.md): neutral dark surfaces, 248/64 px rail, sidebar page finder with no top header row, 36/32 px regular headings, 20 px sections, 14 px reading text, an 880 px centered dashboard with functional URL-backed catalogue search and rounded shortcuts. Catalogue/quotation work remains full-width with inspector and adjacent totals. No external font dependency; intent-based preloading remains. [DESIGN.md](DESIGN.md) records the responsive contract.
+
+These are preview UI changes, not completion of the corresponding production requirements: no authenticated business, persisted products/quotes, public sharing, ingestion, or Tally connection. Performance targets require measurement; accessibility release gates still apply.
+
+**29 October refinement:** route location moved from the header to the bottom-left bar, replacing fixture/save-status copy; Keyboard shortcuts remains only bottom-right, not above the sidebar session. Footer hover/focus matches navigation. Radix Dialog/Tooltip/Tabs now supply accessible interaction primitives, while shared wrappers and tokens preserve the current appearance. This is a foundation for subsequent UI, not an accessibility conformance claim.
+
 ## Start here: choose one small ticket
 
 The original **80 RAL requirements below are parent requirements, not individual coding assignments**. Their low-level details remain intact. Day-to-day implementation now uses **271 smaller tickets**, grouped by screen and then by feature in the following files. Shared infrastructure and background processing are explicitly separated from user-facing screens.

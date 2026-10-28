@@ -2,6 +2,10 @@
 
 Sources: [parent requirements](../IMPLEMENTATION.md), [design inventory and C1–C4 specifications](../DESIGN.md). All original parent details, binding contracts and acceptance criteria remain requirements. This plan is not evidence that scaffolding implements them. Target one observable behavior, generally no more than half a day after prerequisites; subdivide if needed rather than treating a screen as one ticket.
 
+## Current layout direction
+
+Follow [Desktop workbench](../WORKSPACE-UX.md): compact toolbar, native comparison table, and contextual inspector beside the table above 1150 px (below it otherwise). The preview supports local fixture filtering, product inspection, close/Escape focus restoration, and contained table scrolling. This does not complete server search, global/shop scope, stock, price provenance, permissions, or the production product drawer. Do not label a local fixture as saved seller data.
+
 ## Explicit parent mapping
 
 - RAL-012 → CAT-001–CAT-002, CAT-019–CAT-020, CAT-030.

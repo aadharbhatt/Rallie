@@ -6,6 +6,10 @@ Documentation-only decomposition; every ticket is TODO, not an implementation cl
 
 **35 tickets:** QTE-001–QTE-035. Each is a roughly half-day implementation or focused verification slice once its dependencies are satisfied; estimate excludes waiting on parent gates. Screen order is reading order, not execution order. Shared parent coverage with another file means complementary responsibilities, not duplicate delivery. `Parent gate RAL-xxx` refers to the original parent acceptance gate, never an invented cross-file child.
 
+## Current layout direction
+
+Follow [Desktop workbench](../WORKSPACE-UX.md): stable example/document tabs, focused editor, and an adjacent pricing summary that stacks on narrow screens. The preview has in-memory examples with integer-paise calculations only. Its refreshed layout does not complete persisted tabs, catalogue-to-quote addition, customer selection, save/revisions, approval, PDF, or sharing. Preserve the single Build experience and all commercial/access boundaries below.
+
 ## Working contract
 
 - Every authenticated endpoint below resolves Owner/Employee business membership server-side, validates nested ownership, uses bounded typed schemas and stable safe errors, and protects cookie mutations against CSRF/origin abuse. No posted tenant, totals, status, or hash is trusted. Read routes have no commercial side effects.

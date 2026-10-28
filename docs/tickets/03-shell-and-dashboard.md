@@ -2,6 +2,12 @@
 
 Sources: [parent requirements](../IMPLEMENTATION.md), [design inventory, shell, H1 and loading specifications](../DESIGN.md). The 80 parent requirements remain authoritative. These tickets add implementable increments, not completion claims. Target one observable behavior per ticket, normally at most half a day after prerequisites. All source security, accessibility, responsive and evidence rules are inherited.
 
+## Current layout direction
+
+29 October refinement: no top route breadcrumb or duplicate sidebar help. Current-page path is bottom-left; Keyboard shortcuts only bottom-right. Both footer items share navigation highlight/focus styles. Use the Radix dialog/tooltip foundation and Radix quotation tabs rather than custom focus-management primitives. Keep the current page and shortcuts label visible at narrow widths.
+
+Follow [Desktop workbench](../WORKSPACE-UX.md): 248/64 px rail with page finder and collapse toggle, no top header row, 29 px status strip, centered 880 px start page, 36 px regular heading, working product search, and rounded task shortcuts. Keep 14 px reading text and 12 px metadata; remove repeated overlines/metrics/badges. Finder remains accessible in collapsed/mobile rails. Keyboard and preloading remain. Authenticated identity, saved preferences, business-safe restoration, and production activity remain separate gates; no invented business KPIs.
+
 ## Explicit parent mapping
 
 - RAL-001 → SHL-001, SHL-004 (minimal accessible entry).

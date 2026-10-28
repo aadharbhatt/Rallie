@@ -4,6 +4,8 @@
 **Research accessed:** 28 October 2026.  
 **Product authority:** [rallie-init.md](../rallie-init.md). Where that brief defines commercial behavior, permissions, or delivery sequence, it wins. Routes, dimensions, interaction details, and budgets below are design decisions, not assertions about existing implementation.
 
+**Desktop workspace revision — 28 October 2026:** [Workspace UX rationale and reference analysis](WORKSPACE-UX.md) records the current dark, compact direction and preview implementation. Its shell, visual hierarchy, typography, and panel placement supersede earlier warm-paper presentation details. Commercial, security, permission, and accessibility requirements remain unchanged. A preview is not completion of the production backlog.
+
 ## 1. Purpose and non-negotiables
 
 Rallie is a calm, fast shop-counter workspace for finding products, reviewing manufacturer price lists, building quotations, and handing approved business to Tally. It should feel like a well-organized price book and quotation pad, not a generic SaaS analytics dashboard.
@@ -28,7 +30,7 @@ The URLs below were actually fetched using HTTPS with redirect following; each r
 
 | ID | Official resource actually accessed | Finding translated into Rallie |
 | --- | --- | --- |
-| R1 | [WAI APG: Tabs](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/) | One tab stop in the tab list; arrows move between tabs. Automatic activation is appropriate only when panels are available without noticeable latency. Rallie uses manual activation for lazy quote panels and deterministic focus after closing a tab. |
+| R1 | [WAI APG: Tabs](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/) | One tab stop in the tab list; arrows move between tabs. Radix Tabs uses automatic activation for the immediate local quotation panels. Future lazy panels use manual activation if loading would delay focus; closing a future document tab needs deterministic focus. |
 | R2 | [WAI APG: Modal dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) | Focus enters the dialog, Tab remains inside, Escape closes, and focus returns logically. Complex review content starts at its heading; consequential confirmations start at the safe choice. |
 | R3 | [WAI APG: Grid](https://www.w3.org/WAI/ARIA/apg/patterns/grid/) | A grid is a composite interaction with managed focus, not a styling name. Spreadsheet navigation and editing need distinct key handling. Use native tables unless the complete grid contract is implemented and tested. |
 | R4 | [WAI APG: Combobox](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) | Input text editing must survive popup navigation. Listbox options are selected with arrows and Enter; Escape dismisses. Rich result cards with several buttons must not masquerade as listbox options. |
@@ -52,41 +54,39 @@ Our 44-pixel touch target and prominent focus ring are product requirements beyo
 
 ### 3.1 Direction
 
-Use warm paper around white work surfaces, dark ink for reading, restrained teal for actions/selection, and amber for decisions needing attention. Thin separators, aligned numbers, quiet typography, and predictable spacing create polish. Avoid making every item a rounded card: cards group tasks, tables compare records, and lists support browsing. Brand distinction comes from material-like neutrals and clear commercial hierarchy, not effects.
+Use the supplied AI Studio blueprint: a continuous neutral dark canvas, quiet elevated inputs/chips, pale-blue interactive accents, regular 32–36 px headings, and consistent 14 px reading text. The start page is a centered, useful catalogue-search entry, not a promotional hero. Operational catalogue/editor surfaces retain available width. Remove redundant overlines, metrics, badges, and disclaimers rather than shrinking text. Keep navigation, command access, and status stable. No simulated business analytics or AI prompt controls.
 
-### 3.2 Light-theme colors
+### 3.2 Desktop workbench colors
 
-All tokens are semantic. Components consume tokens, never unexplained one-off hex values. Dark mode is not in this scope. Respect forced-colors mode with system colors and visible borders rather than trying to preserve the palette.
+The current preview uses a dark default, not a theme switcher. Canonical workbench values and their implementation mapping are recorded in [WORKSPACE-UX.md](WORKSPACE-UX.md). Respect forced-colors mode with system colors and visible borders rather than trying to preserve the palette.
 
 | Token | Value | Contract |
 | --- | --- | --- |
-| `canvas` | `#F7F5F0` | Warm neutral page background. |
-| `surface` | `#FFFFFF` | Main work area, popovers, sheets. |
-| `surface-subtle` | `#EFEEE8` | Table headings and quiet grouping; not disabled text. |
-| `ink` | `#172B2A` | Primary text and prominent totals. |
-| `ink-muted` | `#52615D` | Secondary labels, dates, helper text; never opacity-reduced body copy. |
-| `border-subtle` | `#D8DED7` | Decorative dividers only; not the sole boundary of an input. |
-| `border-control` | `#667A73` | Inputs, checkboxes, and essential control outlines. |
-| `action` | `#0F766E` | Teal primary button, links, selected controls, focus outer ring. |
-| `action-hover` | `#115E59` | Hovered primary button. |
-| `action-pressed` | `#134E4A` | Pressed primary button. |
-| `selection` | `#E6F3EF` | Selected row/tab surface with teal edge and text/icon marker. |
-| `warning-ink` / `warning-surface` | `#854D0E` / `#FFF4D6` | New price, missing mapping, stale evidence, unsaved warning. |
-| `danger-ink` / `danger-surface` | `#B42318` / `#FEF3F2` | Invalid field, rejected action, failure; not ordinary price drift. |
-| `success-ink` / `success-surface` | `#0F766E` / `#E6F3EF` | Saved, approved, confirmed; always with words/icon. |
-| `overlay` | `rgba(23,43,42,0.40)` | Modal scrim; only one modal layer at a time. |
-| `focus-gap` | `#FFFFFF` | 2 px separation between control and outer 2 px teal ring. |
+| `canvas` | `#131314` | Continuous background, sidebar, and chrome. |
+| `surface` | `#1E1F20` | Panels and reading surfaces. |
+| `surface-subtle` | `#282A2C` | Inputs, chips, selected navigation. |
+| `ink` | `#E2E2E2` | Primary text and prominent totals. |
+| `ink-muted` | `#A4A7A5` | Secondary labels, dates, helper text. |
+| `border-subtle` | `#333537` | Decorative separators, not an essential state alone. |
+| `border-control` | `#5F6364` | Essential input boundary, supplemented by focus. |
+| `action` / `focus` | `#A8C7FA` | Pale blue links, primary action, visible 2 px focus ring. |
+| `action-hover` | `#C2D7FC` | Hovered primary action with dark text. |
+| `selection` | `#282A2C` / `#253246` | Neutral navigation / blue-tinted selected table row, plus semantic state. |
+| `warning-ink` | `#DFC28C` | Missing configuration or conditions needing attention, in words. |
+| `danger-ink` | `#F2B8B5` | Invalid field or failure, always described in text. |
+| `success-ink` | `#A8DAB5` | Confirmed state backed by data, never a fake saved badge. |
+| `overlay` | `#00000099` | Modal scrim; only one modal layer. |
 
-Calculated using WCAG relative luminance, rounded to two decimals: ink/canvas **13.62:1**; muted/white **6.51:1**; muted/canvas **5.97:1**; white/action **5.47:1**; action/selection **4.80:1**; warning pair **6.25:1**; danger pair **6.05:1**; control border/white **4.57:1**, border/canvas **4.19:1**. These validate only these opaque pairings. Test actual hover, selected, focused, disabled, overlay, and composited states in implementation. Decorative separators need not meet control contrast, but must never carry essential meaning alone.
+The previous light-palette contrast calculations no longer apply. Test actual text, hover, selection, focus, control outlines, overlays, forced colors, and composited states before release. Decorative separators need not meet control contrast but must never carry essential meaning alone. This revision does not certify WCAG conformance.
 
 ### 3.3 Typography
 
-- Font family: `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`. No Google Fonts, CDN font requests, or runtime external typography dependencies.
+- Font family: `Inter, Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`; Inter/Roboto are local-only fallbacks, not downloads. No unlicensed Google Sans bundling, Google Fonts request, or runtime external typography dependency. The supplied blueprint is a visual estimate, not verified computed AI Studio styles.
 - If a later brand typeface is approved, self-host licensed WOFF2 subsets, preserve fallback metrics, use swap behavior, and include font bytes in the route budget. Rupee and supported language glyphs must work offline after load.
-- Body: **16/24 px**, weight 400. Dense desktop table text: **14/20 px**, not below 14 px for operational content. Form inputs remain 16 px, including mobile to avoid browser auto-zoom.
-- Page title: **28/34 px**, weight 650 where available; section title **20/28**, weight 600; component title **16/24**, weight 600; metadata **13/18** minimum; quote total **28/34**, weight 650.
+- Body/navigation/product text: **14 px / 1.6**, weight 400; active navigation 500. Metadata **12 px**, not 8–10 px. Use fewer labels instead of smaller labels. Touch inputs remain 16 px.
+- Start heading **36 px / 400**; route heading **32 px / 400**; section heading **20 px / 500**; mobile heading **28 px**; quote total **24 px / 400**. Text must remain readable with zoom and spacing changes; target sizes are independent of text size.
 - Use rem-based sizes and unitless line heights in implementation. No fixed-height text containers that clip at zoom or increased text spacing.
-- Prices, quantities, percentages, and counts use tabular lining numerals; right-align numeric table columns. SKU uses a restrained monospace stack (`ui-monospace, SFMono-Regular, Consolas, monospace`) at 14/20, with selectable full text.
+- Prices, quantities, percentages, and counts use tabular lining numerals; right-align numeric table columns. SKU uses a restrained monospace stack (`ui-monospace, SFMono-Regular, Consolas, monospace`) as secondary metadata, with selectable full text and a full-value inspector.
 - Sentence case throughout. Uppercase only short brand marks, familiar acronyms such as MRP/SKU/PDF, and genuine product codes. Long names wrap; truncation must have a keyboard/touch-accessible full-value view, not only a hover tooltip.
 
 ### 3.4 Geometry, density, and icons
@@ -94,10 +94,10 @@ Calculated using WCAG relative luminance, rounded to two decimals: ink/canvas **
 | System | Values / rule |
 | --- | --- |
 | Spacing | 4 px base; tokens 4, 8, 12, 16, 20, 24, 32, 40, 48, 64. Use 8–12 inside related controls; 24–32 between sections. |
-| Radius | 4 px fields/cells; 8 px buttons/cards; 12 px sheets/dialogs; pills only for status tags, not every action. |
+| Radius | 28 px main search (24 px mobile); 18 px action chips/buttons; 12 px panels/inspector; 8 px numeric fields; 20 px modal. Rounded task shortcuts are appropriate; editor tabs remain squared. |
 | Elevation | Flat base surfaces; small shadow for menus; medium for modal sheets. Example small: `0 2px 8px rgba(23,43,42,.08)`; medium: `0 12px 32px rgba(23,43,42,.16)`. Borders remain visible. |
-| Default comfortable | Controls 40 px minimum; data rows 48 px minimum, 64 px for two-line product rows. Header/toolbar density matches content. |
-| Compact desktop | Explicit preference only: controls 36 px; simple rows 40 px minimum. Never reduce font to squeeze more rows. Multi-line content may grow. |
+| Desktop workbench default | Navigation 40 px, toolbar/number controls 40 px, chips 36 px, product-name targets ≥28 px; table rows grow with content. Main search 72 px with 16–20 px padding. |
+| Comfortable / touch | Coarse pointers override compact geometry with ≥44 px hit areas and 16 px input text. A future density preference is not implemented by the preview. Multi-line content must remain able to grow. |
 | Touch/coarse pointer | Controls and icon hit areas at least 44 × 44 px; rows at least 56 px; 8 px separation for adjacent destructive/primary controls. Touch wins over compact preference. |
 | Icon size | 16 px in metadata, 20 px in buttons, 24 px in primary navigation; consistent 1.75–2 px stroke family, bundled locally. |
 | Icons | Search, plus, file, check, warning, clock, link, chevron, close, external link. Decorative icons hidden from accessibility tree. Meaningful icons have text or accessible names. No emoji as production status UI. |
@@ -108,10 +108,12 @@ Calculated using WCAG relative luminance, rounded to two decimals: ink/canvas **
 ### 4.1 Authenticated shell
 
 - Left navigation is exactly **Dashboard, Catalogue, Quotations, Tally, Settings**, then a separated **Admin** entry only for Platform Admin. Do not add a separate Inventory top-level module: seller catalogue is commercial inventory; Tally owns stock.
-- Desktop rail: 224 px. Top business/context bar: 56 px. Content padding: 24 px; page headers share a baseline and place one main action at the right. A small account/help control exposes preferences, keyboard help, and sign out.
+- Desktop rail: **248 px**, collapsible to **64 px**. No top header row; page finder lives below the sidebar brand/collapse toggle, above navigation. Collapsed/mobile search is an accessible icon button with the same command dialog and shortcut. Bottom strip **29 px** baseline: current-page path on the left, the only Keyboard shortcuts control on the right, with navigation-matching hover/focus. Coarse-pointer footer targets expand to ≥44 px. Operational content uses 32–48 px side padding and 40 px top padding; start-page content uses 56 px vertical spacing and an 880 px centered column. Only session identity stays at the bottom of the rail. No fake sign-out/account switcher.
+
+- Interaction foundation: Radix Dialog, Tooltip, and Tabs, styled with shared local tokens. Reusable modal/tooltip wrappers avoid reimplementing focus trapping, background isolation, dismissal, and keyboard tooltip behavior. Retain native semantic forms, buttons, links, tables, and disclosures; keep testing actual accessibility rather than treating a library as certification.
 - Header includes business name, user identity/role when opened, and truthful connectivity/save context. Do not place cost/profit in globally visible notifications.
 - Business switching appears only when membership permits it. Confirm or resolve unsaved work first; clear business-specific cached data and tab restoration before opening the new business. Never leak a prior business's costs in a transition skeleton.
-- Dashboard/forms use a reading width around 1120 px. Catalogue, review, quotations, and moderation use available width up to 1760 px, centered beyond it. Forms generally cap at 640 px.
+- Dashboard/Tally/settings use an **880 px centered reading cap**. Dashboard has a functional product search, three rounded shortcuts, sample products, and concise connection status with diagnostic disclosure—not a metric/task-card grid. Catalogue, quotations, and review retain available width. Forms generally cap at 640 px. Inspector is adjacent when wide, below when constrained.
 - Landmarks: skip links, primary navigation, header, main; workspace sections have named headings/regions. Use one page-level h1 and meaningful document titles such as “Rajesh — Q100 · Quotations · Rallie”.
 - Browser Back/Forward works with routes, selected catalogue scope, filters, and quote ID. Query parameters carry only appropriate non-secret state. Public bearer links are never copied into analytics events.
 
@@ -119,11 +121,10 @@ Calculated using WCAG relative luminance, rounded to two decimals: ink/canvas **
 
 | Width / input | Layout |
 | --- | --- |
-| ≥1440 px, keyboard/mouse | Full rail. Quote workspace roughly 58% catalogue search / 42% quote, quote pane minimum 420 px. Review can show evidence beside the table. |
-| 1200–1439 px | Full rail or persisted collapsed 72 px rail; two-pane quote remains if minimum widths fit. Collapse tertiary evidence into a drawer before shrinking price fields. |
-| 960–1199 px | 72 px rail with visible accessible labels on expansion; dense pages use full width. Quote panes remain only if search ≥320 px and quote ≥400 px after gutters, otherwise stack. |
-| 768–959 px | Compact header and navigation drawer; search and quote sections stack with visible jump links. Product/evidence sheets use most of the viewport. No hover-only controls. |
-| <768 px | Single-column app and public page; navigation is an explicit button. Quote summary and “Jump to quote” remain reachable, not overlapping inputs. Multi-quote chooser replaces a squeezed tab strip. Review offers row-detail forms with Previous/Next; native table can scroll inside a named container. |
+| >1150 px, keyboard/mouse | 248 px rail or collapsed 64 px rail. Dashboard is one centered column. Catalogue inspector 288 px; quote summary 320 px (360 px at ≥1600). |
+| 761–1150 px | Inspector moves below table; quote summary 280 px. Centered reading/start surfaces shrink fluidly. Rail can be collapsed explicitly. |
+| ≤760 px | 64 px icon rail with accessible names/titles; stacked quote summary, wrapping shortcuts, 28 px headings. Command icon remains visible. Only tab/table regions scroll horizontally; coarse-pointer targets expand to ≥44 px. |
+| Future production quote search | Keep one Build workspace: catalogue/search beside quote when minimum working widths fit; otherwise stack with jump links. The current calculator preview is not implementation of that full composer. |
 | 320 CSS px / 400% zoom | No page-level horizontal scroll except genuinely two-dimensional data inside its own labeled scroll area. All non-table controls, messages, dialogs, and public quote lines reflow. |
 
 Breakpoint changes never discard input or reset active quote/selection. Preserve DOM focus on the same logical control; do not leave duplicate hidden controls tabbable. Sticky headers/footers account for safe-area insets, virtual keyboards, and `scroll-padding`; focused controls must not be obscured. Use minimum heights rather than desktop viewport locks that trap zoomed content.
@@ -178,7 +179,7 @@ Native keyboard behavior always works without enabling shortcuts. Navigation lin
 
 1. **Never intercept browser Ctrl/Cmd+W, +L, +T, +N, +R, +F, +P, browser tab-switching commands, zoom, or browser Back/Forward.** Do not bind a global Save handler over browser shortcuts. Do not use Alt-letter/accesskey bindings or Ctrl+Alt combinations that collide with menus, assistive tech, or AltGr.
 2. Optional character chords are **off by default**, described in visible Keyboard help and Settings → Preferences, switchable off, and remappable. Suggested defaults when enabled: `g` then `d` Dashboard, `g` then `c` Catalogue, `g` then `q` Quotations, `n` then `q` New quote. No chord for approval, billing, merging, deleting, or sharing.
-3. Use a central shortcut registry with scopes. Ignore a shortcut if the event is already handled, composing (`isComposing`, composition lifecycle, legacy keyCode 229 fallback), repeating, or has unexpected modifiers. Ignore events from input, textarea, select, contenteditable, textbox/searchbox/combobox/spinbutton, grid edit mode, password controls, or any editable descendant, including the composed event path.
+3. Use a central shortcut registry with scopes. Ignore a shortcut if the event is already handled, composing (`isComposing`, composition lifecycle, legacy keyCode 229 fallback), repeating, or has unexpected modifiers. Ignore navigation/help/sidebar shortcuts from input, textarea, select, contenteditable, textbox/searchbox/combobox/spinbutton, grid edit mode, password controls, or any editable descendant, including the composed event path. Explicit exception: `⌘/Ctrl K` may open the page finder from an editable field; closing restores that field and does not change its contents.
 4. Do not globally capture arrows, Enter, Escape, Delete, or Space. The focused widget owns them. During IME composition, Enter must commit text, never add a product, submit a form, or approve a quote.
 5. After the first chord key, show a small “Navigation shortcut: g … · Esc to cancel” helper; cancel after 1.5 s or any focus/route/modal change. A timeout is acceptable because every action has an untimed visible equivalent. Do not suppress typing merely because it resembles an incomplete chord.
 6. Only `preventDefault` for a matched, enabled, safe action that is actually handled. Do not try to detect screen-reader presence; let users disable/remap shortcuts and test actual AT combinations.

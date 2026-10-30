@@ -79,7 +79,7 @@ Every row's owner is **agent/unassigned** until explicitly assigned. Parent deta
 | ID | Slice / deliverable | Status | Owner |
 |---|---|---|---|
 | RAL-001 | Foundation: workspace and typed boundaries | DONE | GitHub Copilot |
-| RAL-002 | Foundation: Docker local Cloudflare runtime | TODO | agent/unassigned |
+| RAL-002 | Foundation: Docker local Cloudflare runtime | DONE | GitHub Copilot |
 | RAL-003 | Foundation: shell and health | TODO | agent/unassigned |
 | RAL-004 | Foundation: environment and migration isolation | TODO | agent/unassigned |
 | RAL-005 | Foundation: automated checks and local gate | TODO | agent/unassigned |
@@ -218,13 +218,13 @@ These are proposed implementation decisions, not unstated requirements from the 
 - **Evidence / notes:** [RAL-001 evidence and applicability review](FOUNDATION.md); all mapped children FND-001–003 verified. `npm ci`, separate package/tool typechecks, 65 unit/contract tests, web build + Worker dry-run and browser credential/server-marker audit passed; 1 real D1 emulator replay/repeat/upgrade integration passed; all 15 Playwright tests passed against built assets + Worker/D1; audit reported 0 vulnerabilities. Thin typed SQL + Zod selected. No secrets supplied or source maps emitted; bundle signature scanning is not a general credential-proof mechanism. Migration unchanged: `0001_foundation.sql` only. No Docker/R2/Workflow/DO/deployment completion or authenticated domain functionality is claimed; later parents remain TODO. Commit/PR absent explicitly, changes remain in the working tree.
 
 ### RAL-002 — Make local web/API runnable in Docker with Cloudflare emulation
-- **Status:** TODO; **Owner:** agent/unassigned; **Dependencies:** RAL-001.
+- **Status:** DONE; **Owner:** GitHub Copilot; **Dependencies:** RAL-001. Started/verified 2026-10-30; uncommitted working tree based on 37d4d29, no new commit/PR. Scope FND-004–007 only.
 - **Scope:** Reproducible development container(s) for web/API, persistent local Wrangler/Miniflare-compatible D1/R2/Workflow/DO state, health probes and reset procedure. Docker is local only; production stays Cloudflare. Do not replace bindings with unrelated SQLite/file/in-memory fakes.
 - **UI / keyboard:** Environment indicator and explicit unavailable-service message; mock badges are readable by assistive technology.
 - **API / security:** Local bindings smoke path uses isolated development configuration. Mock extraction and mock Tally are **off by default**, require explicit independent opt-ins, and cannot use live credentials. Stub interfaces only here; no claim of real AI or Windows service support.
 - **DB / migrations:** Persistent dev volume and repeatable foundation migration replay; production resources inaccessible from default local setup.
-- **Acceptance:** [ ] Clean machine starts web/API with health passing. [ ] D1/R2 persist across restart; Workflow and DO smoke tests execute locally. [ ] Default mode never silently mocks service failures.
-- **Evidence / notes:** _Pending: runtime versions, startup steps, smoke logs, emulator limitations._
+- **Acceptance:** [x] Clean machine starts web/API with health passing. [x] D1/R2 persist across restart; Workflow and DO smoke tests execute locally. [x] Default mode never silently mocks service failures.
+- **Evidence / notes:** [RAL-002 setup, executed checks and limits](LOCAL-RUNTIME.md); all mapped children FND-004–007 verified. Clean Linux image-layer install and healthy Docker web/Worker startup; real D1/R2 fixture retention across restart, completed local Workflow and persisted DO request, removed Workflow/DO binding failures, independent default-off flags and test-volume reset/replay passed via `npm run test:runtime`. 96 unit/contract tests, 17 Docker-backed Playwright tests, real D1 migration replay/upgrade, package typechecks and web/production Worker dry-run/audits passed. Actual manual Docker outage showed unavailable (no fallback); independent stub labels observed. Docker CLI 29.4.1/Engine 29.2.1, Compose 5.1.3, container Node 22.23.4, Wrangler 4.154.0 on macOS/Colima arm64. No new domain migration or real extraction/Tally; smoke handlers excluded from production entrypoint. Source snapshots require rebuild. Full staging/production isolation, deployment and real integrations remain separate gates.
 
 ### RAL-003 — Deliver application shell and health endpoint
 - **Status:** TODO; **Owner:** agent/unassigned; **Dependencies:** RAL-001, RAL-002.

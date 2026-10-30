@@ -1,0 +1,2 @@
+# Intentionally empty. Local commands use this file instead of auto-loading .env/.dev.vars.
+# No live credentials belong in the local container or emulator.

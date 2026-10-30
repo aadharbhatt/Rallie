@@ -1,5 +1,11 @@
 # Foundation test boundaries
 
+## RAL-002 Docker/runtime coverage
+
+Use `npm run local:up` and `PLAYWRIGHT_BASE_URL=http://127.0.0.1:5174 npm run test:e2e -- --workers=2` for the full **17-test** suite (explicit mock flags off). [runtime.spec.ts](e2e/runtime.spec.ts) checks real default-off runtime labels/keyboard skip navigation and intercepted independent stub-label fixtures. Native `npm run dev:api` now uses the guarded local entrypoint too.
+
+`npm run test:runtime` builds a disposable Docker test project and exercises actual D1/R2 read/write, DO persisted requests, Workflow completion, restart, API outage, every mock-flag combination, removed Workflow/DO bindings and test-volume reset. It is not a fake binding integration and never resets dev state. Unit tests use explicit binding doubles for negative cases. [Local runtime guide/evidence](../docs/LOCAL-RUNTIME.md) records the 96-unit-test and actual Docker/manual results plus limitations.
+
 - Vitest: `npm test` uses the root configuration for package/API source tests and script unit tests; excludes Playwright and D1 integration tests. Node 22.12+ supplies the Worker handler's standard Web APIs. API tests mock binding interfaces, not an actual D1 instance.
 - D1 integration: `npm run test:migrations` runs Wrangler against an isolated real local D1 emulator, verifies replay/upgrade/version tracking, and cleans up its own temporary state.
 - Playwright: use `tests/e2e` as `testDir`; base URL defaults to Vite at `http://127.0.0.1:5173`. Run `npm run build`, `npm run db:migrate -- --env dev`, and `npm run dev:api` for the Worker and built assets on 8787 with `.local/state/dev` persistence. Either start Vite with `npm run dev`, or set `PLAYWRIGHT_BASE_URL=http://127.0.0.1:8787` and test the built SPA directly. The real `/health` smoke test requires D1 to be bound and reachable.

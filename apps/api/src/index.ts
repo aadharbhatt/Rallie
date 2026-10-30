@@ -1,17 +1,10 @@
-import { apiErrorSchema, healthSchema, livenessSchema, type ApiError, type HealthResponse } from '@rallie/api-contracts';
+import { healthSchema, livenessSchema, type HealthResponse } from '@rallie/api-contracts';
 import { probeDatabase } from '@rallie/db';
 import type { Env } from './env';
+import { error, json } from './responses';
+import { runtimeStatus } from './runtime';
 
 export type { Env } from './env';
-
-function json(body: unknown, status = 200, headers: Record<string, string> = {}): Response {
-  return Response.json(body, { status, headers: { 'Cache-Control': 'no-store', ...headers } });
-}
-
-function error(code: ApiError['code'], message: string, status: number, headers: Record<string, string> = {}): Response {
-  const requestId = crypto.randomUUID();
-  return json(apiErrorSchema.parse({ code, message, requestId }), status, { 'X-Request-ID': requestId, ...headers });
-}
 
 async function databaseStatus(env: Env): Promise<HealthResponse['database']['status']> {
   if (!env.DB) return 'not_configured';
@@ -33,7 +26,10 @@ async function databaseStatus(env: Env): Promise<HealthResponse['database']['sta
 }
 
 export async function handleRequest(request: Request, env: Env): Promise<Response> {
+  const runtime = runtimeStatus(env);
+  if (!runtime) return error('invalid_configuration', 'Mock services require an explicit dev/test environment and boolean flags.', 503);
   const url = new URL(request.url);
+  if (url.pathname.startsWith('/api/__local')) return error('not_found', 'This route is not available.', 404);
   if (url.pathname === '/health/live') {
     if (request.method !== 'GET') return error('method_not_allowed', 'Use GET for health checks.', 405, { Allow: 'GET' });
     return json(livenessSchema.parse({ service: 'rallie-api', build: { version: '0.0.0' }, status: 'alive' }));
@@ -45,6 +41,7 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
     const health = healthSchema.parse({
       service: 'rallie-api',
       stage: 'foundation',
+      runtime,
       build: { version: '0.0.0' },
       status: database === 'ok' ? 'ok' : 'degraded',
       readiness: database === 'ok' ? 'ready' : 'unready',

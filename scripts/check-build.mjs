@@ -14,4 +14,9 @@ function inspect(directory) {
   }
 }
 inspect(resolve('apps/web/dist'));
+const worker = readFileSync(resolve('.local/worker-build/index.js'), 'utf8');
+if (/FoundationSmokeWorkflow|FoundationSmokeObject|ral002-foundation-smoke|foundation-smoke.invalid|__local_foundation_smoke__/.test(worker)) {
+  throw new Error('Production Worker bundle contains a local-only emulator probe.');
+}
+console.log('Production Worker audit passed: local-only Workflow/DO and diagnostic handlers excluded.');
 console.log('Browser bundle audit passed: no server SQL/bindings, source maps, or known credential signatures. This is not a substitute for secret-store hygiene.');

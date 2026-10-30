@@ -51,48 +51,48 @@ Each ticket is intended as one independently verifiable increment, normally no m
 ## Support area: reproducible local Cloudflare runtime (not a screen)
 
 ### FND-004 — Start local web and Worker through development containers
-- **Status:** TODO
-- **Owner:** unassigned
+- **Status:** DONE (started/verified 2026-10-30; uncommitted working tree based on 37d4d29, no new commit/PR)
+- **Owner:** GitHub Copilot
 - **Parents:** RAL-002 ([requirement](../IMPLEMENTATION.md)).
 - **Depends on:** FND-001, FND-002, FND-003.
-- **UI checklist:** [ ] Browser can reach the minimal web entry and a truthful development indicator.
-- **API/backend checklist:** [ ] Document lockfile/runtime prerequisites, startup and health probes using Wrangler/Miniflare-compatible bindings; Docker remains local-only, not production architecture.
-- **DB checklist:** [ ] Bind local D1 through the emulator, not an unrelated SQLite or in-memory substitute.
+- **UI checklist:** [x] Browser can reach the minimal web entry and a truthful development indicator.
+- **API/backend checklist:** [x] Document lockfile/runtime prerequisites, startup and health probes using Wrangler/Miniflare-compatible bindings; Docker remains local-only, not production architecture.
+- **DB checklist:** [x] Bind local D1 through the emulator, not an unrelated SQLite or in-memory substitute.
 - **Verify:** 1. Follow clean-machine startup instructions: web and API respond. 2. Stop the API: web reports service unavailable instead of simulated success.
-- **Evidence:** pending.
+- **Evidence:** [RAL-002 setup and executed evidence](../LOCAL-RUNTIME.md). Clean Linux image-layer `npm ci`/web build, non-root Worker + Vite startup and health passed on macOS/Colima arm64; local web 5174/API 8788. Real API stop → Refresh showed API unavailable, no simulated success; default-off recovery observed. Real Docker lifecycle checks passed; 96 unit/contract tests and all 17 Playwright tests passed. Docker source snapshots require rebuild, not bind-mounted HMR; no deployment/real AI/Tally claim. UI saving/permissions/tenant commercial paths N/A to this foundation scope.
 
 ### FND-005 — Preserve D1 and private R2 across local restarts
-- **Status:** TODO
-- **Owner:** unassigned
+- **Status:** DONE (started/verified 2026-10-30; uncommitted working tree based on 37d4d29, no new commit/PR)
+- **Owner:** GitHub Copilot
 - **Parents:** RAL-002 ([requirement](../IMPLEMENTATION.md)).
 - **Depends on:** FND-004.
 - **UI checklist:** None; inspect through smoke assertions rather than a new management screen.
-- **API/backend checklist:** [ ] Use local-only binding probes to write/read a harmless fixture object; document restart and explicitly destructive local reset.
-- **DB checklist:** [ ] Persist emulator state in development volumes; reset targets cannot point at staging/production resources.
+- **API/backend checklist:** [x] Use local-only binding probes to write/read a harmless fixture object; document restart and explicitly destructive local reset.
+- **DB checklist:** [x] Persist emulator state in development volumes; reset targets cannot point at staging/production resources.
 - **Verify:** 1. Restart containers: D1 fixture and R2 object survive. 2. Explicitly reset only the test volume: fixtures disappear and migrations restore clean state.
-- **Evidence:** pending.
+- **Evidence:** [State/reset ownership and execution](../LOCAL-RUNTIME.md). `npm run test:runtime` passed actual D1/R2 fixed fixture writes/reads and container restart retention; disposable test-volume reset removed fixtures, startup replayed unchanged `0001_foundation.sql`, all bindings recovered. Fixed dev/test/verification projects and named volume isolation; no arbitrary volume target, dev reset or prune. Reset requires explicit test confirmation and rejects production before Docker; guard unit tests passed. Role/tenant/commercial-audit/UI/keyboard N/A for harmless fixed local probes; full environment isolation remains FND-008/010.
 
 ### FND-006 — Exercise local Workflow and Durable Object bindings
-- **Status:** TODO
-- **Owner:** unassigned
+- **Status:** DONE (started/verified 2026-10-30; uncommitted working tree based on 37d4d29, no new commit/PR)
+- **Owner:** GitHub Copilot
 - **Parents:** RAL-002 ([requirement](../IMPLEMENTATION.md)).
 - **Depends on:** FND-004.
 - **UI checklist:** None; no processing, bridge or Tally screen is implied by smoke success.
-- **API/backend checklist:** [ ] Execute one isolated Workflow smoke and one Durable Object request through real emulator bindings; keep probes dev/test-only and document emulator limits.
+- **API/backend checklist:** [x] Execute one isolated Workflow smoke and one Durable Object request through real emulator bindings; keep probes dev/test-only and document emulator limits.
 - **DB checklist:** None; no ingestion/job/bridge schema in foundation.
 - **Verify:** 1. Observe Workflow completion and deterministic DO response. 2. Remove each binding in turn: smoke fails explicitly, with no silent fake fallback.
-- **Evidence:** pending.
+- **Evidence:** [Local Workflow/DO contract and limitations](../LOCAL-RUNTIME.md). `npm run local:smoke` and disposable `npm run test:runtime` observed actual emulated Workflow completion with checked output and deterministic persisted DO response; restart retained both. Each binding was removed in separate real emulator runs: smoke returned 503 `binding_unavailable` with no fallback. Local-only entrypoint, origin/host/payload guards, production-handler exclusion/build audit verified. No ingestion/Tally implementation or deployment durability claim. UI/keyboard/tenant business tests N/A; safe local diagnostics tested.
 
 ### FND-007 — Make mock-service opt-in explicit and isolated
-- **Status:** TODO
-- **Owner:** unassigned
+- **Status:** DONE (started/verified 2026-10-30; uncommitted working tree based on 37d4d29, no new commit/PR)
+- **Owner:** GitHub Copilot
 - **Parents:** RAL-002 ([requirement](../IMPLEMENTATION.md)).
 - **Depends on:** FND-004.
-- **UI checklist:** [ ] Development mock labels are readable by assistive technology; unavailable service has explicit copy.
-- **API/backend checklist:** [ ] Independent extraction/Tally mock flags default off; opt-in interfaces cannot consume live credentials; production rejects either flag, without implementing those services.
+- **UI checklist:** [x] Development mock labels are readable by assistive technology; unavailable service has explicit copy.
+- **API/backend checklist:** [x] Independent extraction/Tally mock flags default off; opt-in interfaces cannot consume live credentials; production rejects either flag, without implementing those services.
 - **DB checklist:** None; flags add no domain persistence.
 - **Verify:** 1. Default startup and service failure never activate mocks. 2. Toggle each flag independently and inspect visible labels; production configuration fails closed.
-- **Evidence:** pending.
+- **Evidence:** [Independent flags and manual/browser checks](../LOCAL-RUNTIME.md). Real Docker verification exercised extraction-only, Tally-only, both-on and both-off flags; manual browser confirmed independent stub-only labels plus actual outage/recovery. Accessible named status and off/unavailable copy covered by Playwright (mock-label browser cases explicitly intercepted; manual actual container toggles were not). Unit/schema tests reject production/unconfigured/invalid mock settings; startup rejects known live credential variables and pins empty env-file/process-secret behavior. No mock extraction/fake protocol/service output implemented. No DB change or role/tenant mutation requirement applies.
 
 ## Support area: environment and health isolation (not a screen)
 

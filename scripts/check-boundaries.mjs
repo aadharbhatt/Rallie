@@ -45,7 +45,7 @@ export function checkBoundaries(workspace = root) {
           const isTest = file.endsWith('.test.ts');
           const permitted = target
             ? Boolean(destination && allowed[layer].includes(destination))
-            : dependencies.has(packageName) || (isTest && name === 'vitest');
+            : dependencies.has(packageName) || (layer === 'apps/api' && name === 'cloudflare:workers') || (isTest && name === 'vitest');
           if (!permitted) violations.push(`${relative(workspace, file)}: forbidden import ${name}`);
         }
         ts.forEachChild(node, inspect);

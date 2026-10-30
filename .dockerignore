@@ -1,0 +1,15 @@
+.git
+**/node_modules
+**/dist
+**/package-lock.json
+!package-lock.json
+.local
+.wrangler
+**/.env*
+**/.dev.vars*
+**/*.pem
+**/*.key
+test-results
+playwright-report
+coverage
+.DS_Store

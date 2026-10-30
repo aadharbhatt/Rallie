@@ -1,0 +1,97 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Rallie: Docker — Start / rebuild",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/local-runtime.mjs",
+      "args": ["up", "--env", "dev"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": { "RALLIE_MOCK_EXTRACTION": "false", "RALLIE_MOCK_TALLY": "false" },
+      "skipFiles": ["<node_internals>/**"],
+      "presentation": { "group": "Rallie Docker", "order": 1 }
+    },
+    {
+      "name": "Rallie: Docker — Start with explicit mock flags",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/local-runtime.mjs",
+      "args": ["up", "--env", "dev"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": { "RALLIE_MOCK_EXTRACTION": "${input:mockExtraction}", "RALLIE_MOCK_TALLY": "${input:mockTally}" },
+      "skipFiles": ["<node_internals>/**"],
+      "presentation": { "group": "Rallie Docker", "order": 2 }
+    },
+    {
+      "name": "Rallie: Docker — Stop (preserve data)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/local-runtime.mjs",
+      "args": ["down", "--env", "dev"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "presentation": { "group": "Rallie Docker", "order": 3 }
+    },
+    {
+      "name": "Rallie: Docker — Smoke all bindings",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/local-runtime.mjs",
+      "args": ["smoke", "--env", "dev"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "presentation": { "group": "Rallie Docker", "order": 4 }
+    },
+    {
+      "name": "Rallie: Docker — Verify isolated test runtime",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/local-runtime.mjs",
+      "args": ["verify", "--env", "test"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": { "RALLIE_MOCK_EXTRACTION": "false", "RALLIE_MOCK_TALLY": "false" },
+      "skipFiles": ["<node_internals>/**"],
+      "presentation": { "group": "Rallie Docker", "order": 5 }
+    },
+    {
+      "name": "Rallie: Docker — Reset LOCAL TEST data (confirmation required)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/local-runtime.mjs",
+      "args": ["reset", "--env", "test", "--confirm", "${input:resetTestConfirmation}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "presentation": { "group": "Rallie Docker", "order": 6 }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "mockExtraction",
+      "type": "pickString",
+      "description": "Enable extraction stub only? No real PDF extraction or live credentials.",
+      "options": ["false", "true"],
+      "default": "false"
+    },
+    {
+      "id": "mockTally",
+      "type": "pickString",
+      "description": "Enable Tally stub only? No real accounting connection or live credentials.",
+      "options": ["false", "true"],
+      "default": "false"
+    },
+    {
+      "id": "resetTestConfirmation",
+      "type": "pickString",
+      "description": "Deletes only ordinary LOCAL TEST emulator data. Cancel leaves all state untouched.",
+      "options": ["CANCEL", "DELETE_LOCAL_TEST"],
+      "default": "CANCEL"
+    }
+  ]
+}

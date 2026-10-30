@@ -20,6 +20,7 @@ describe('migration environment safety', () => {
     expect(plan.commands[2]).toContain('SELECT name, applied_at FROM d1_migrations ORDER BY id');
     for (const args of plan.commands) {
       expect(args).toContain('--local');
+      expect(args.some((value) => value.startsWith('--env-file=') && value.endsWith('config/local-vars.txt'))).toBe(true);
       expect(args).not.toContain('--remote');
       expect(args[args.indexOf('--env') + 1]).toBe('test');
     }

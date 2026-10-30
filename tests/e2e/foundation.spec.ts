@@ -197,6 +197,7 @@ test('API loading, degraded health, failure, and retry are honest', async ({ pag
     await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({
       service: 'rallie-api', stage: 'foundation', status: 'degraded', checkedAt: new Date().toISOString(),
       build: { version: '0.0.0' }, readiness: 'unready',
+      runtime: { environment: 'test', extraction: 'unavailable', tally: 'unavailable' },
       database: { status: 'error', probe: 'SELECT 1' },
       bindings: { documents: 'not_configured', assets: 'configured', ingestionWorkflow: 'not_configured', tallyConnections: 'not_configured' },
     }) });
@@ -305,6 +306,7 @@ test('connection diagnostics are available without overwhelming the default view
   await page.route('**/health', (route) => route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({
     service: 'rallie-api', stage: 'foundation', status: 'degraded', checkedAt: new Date().toISOString(),
     build: { version: '0.0.0' }, readiness: 'unready',
+    runtime: { environment: 'test', extraction: 'unavailable', tally: 'unavailable' },
     database: { status: 'error', probe: 'SELECT 1' },
     bindings: { documents: 'not_configured', assets: 'configured', ingestionWorkflow: 'not_configured', tallyConnections: 'not_configured' },
   }) }));

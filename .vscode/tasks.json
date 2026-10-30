@@ -1,0 +1,99 @@
+{
+	"version": "2.0.0",
+	"options": {
+		"cwd": "${workspaceFolder}",
+		"env": { "RALLIE_MOCK_EXTRACTION": "false", "RALLIE_MOCK_TALLY": "false" }
+	},
+	"presentation": { "reveal": "always", "panel": "shared", "clear": true },
+	"tasks": [
+		{
+			"label": "Rallie: Docker — Start / rebuild",
+			"type": "process",
+			"command": "node",
+			"args": ["${workspaceFolder}/scripts/local-runtime.mjs", "up", "--env", "dev"],
+			"group": { "kind": "build", "isDefault": true },
+			"problemMatcher": []
+		},
+		{
+			"label": "Rallie: Docker — Start with explicit mock flags",
+			"type": "process",
+			"command": "node",
+			"args": ["${workspaceFolder}/scripts/local-runtime.mjs", "up", "--env", "dev"],
+			"options": { "env": { "RALLIE_MOCK_EXTRACTION": "${input:mockExtraction}", "RALLIE_MOCK_TALLY": "${input:mockTally}" } },
+			"problemMatcher": []
+		},
+		{
+			"label": "Rallie: Docker — Stop (preserve data)",
+			"type": "process",
+			"command": "node",
+			"args": ["${workspaceFolder}/scripts/local-runtime.mjs", "down", "--env", "dev"],
+			"problemMatcher": []
+		},
+		{
+			"label": "Rallie: Docker — Smoke all bindings",
+			"type": "process",
+			"command": "node",
+			"args": ["${workspaceFolder}/scripts/local-runtime.mjs", "smoke", "--env", "dev"],
+			"problemMatcher": []
+		},
+		{
+			"label": "Rallie: Docker — Verify isolated test runtime",
+			"type": "process",
+			"command": "node",
+			"args": ["${workspaceFolder}/scripts/local-runtime.mjs", "verify", "--env", "test"],
+			"group": "test",
+			"problemMatcher": []
+		},
+		{
+			"label": "Rallie: Docker — Stop API only (outage check)",
+			"type": "process",
+			"command": "docker",
+			"args": ["compose", "--env-file", "${workspaceFolder}/config/local-vars.txt", "-f", "${workspaceFolder}/compose.local.yaml", "-p", "rallie-local-dev", "stop", "worker"],
+			"problemMatcher": []
+		},
+		{
+			"label": "Rallie: Docker — Restart containers (preserve data)",
+			"type": "process",
+			"command": "docker",
+			"args": ["compose", "--env-file", "${workspaceFolder}/config/local-vars.txt", "-f", "${workspaceFolder}/compose.local.yaml", "-p", "rallie-local-dev", "restart", "worker", "web"],
+			"problemMatcher": []
+		},
+		{
+			"label": "Rallie: Docker — Show recent logs",
+			"type": "process",
+			"command": "docker",
+			"args": ["compose", "--env-file", "${workspaceFolder}/config/local-vars.txt", "-f", "${workspaceFolder}/compose.local.yaml", "-p", "rallie-local-dev", "logs", "--tail=80", "worker", "web"],
+			"problemMatcher": []
+		},
+		{
+			"label": "Rallie: Docker — Reset LOCAL TEST data (confirmation required)",
+			"type": "process",
+			"command": "node",
+			"args": ["${workspaceFolder}/scripts/local-runtime.mjs", "reset", "--env", "test", "--confirm", "${input:resetTestConfirmation}"],
+			"problemMatcher": []
+		}
+	],
+	"inputs": [
+		{
+			"id": "mockExtraction",
+			"type": "pickString",
+			"description": "Enable extraction stub only? No real PDF extraction or live credentials.",
+			"options": ["false", "true"],
+			"default": "false"
+		},
+		{
+			"id": "mockTally",
+			"type": "pickString",
+			"description": "Enable Tally stub only? No real accounting connection or live credentials.",
+			"options": ["false", "true"],
+			"default": "false"
+		},
+		{
+			"id": "resetTestConfirmation",
+			"type": "pickString",
+			"description": "Deletes only ordinary LOCAL TEST emulator data. Cancel leaves all state untouched.",
+			"options": ["CANCEL", "DELETE_LOCAL_TEST"],
+			"default": "CANCEL"
+		}
+	]
+}

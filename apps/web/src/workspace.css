@@ -1,3 +1,5 @@
+.runtime-notice { margin-top: 16px; padding: 12px 0; border-top: 1px solid var(--border, #333); font-size: 13px; }
+.runtime-notice p { margin: 6px 0 0; color: var(--muted, #aaa); }
 /* AI Studio-inspired visual rhythm, adapted to a commercial workbench. */
 :root {
   color-scheme: dark;

@@ -1,14 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { apiErrorSchema, healthSchema, livenessSchema } from './index';
+import { apiErrorSchema, healthSchema, livenessSchema, runtimeSchema } from './index';
 
 const healthy = {
   service: 'rallie-api', stage: 'foundation', status: 'ok', checkedAt: '2026-10-28T12:00:00.000Z',
   build: { version: '0.0.0' }, readiness: 'ready',
+  runtime: { environment: 'test', extraction: 'unavailable', tally: 'unavailable' },
   database: { status: 'ok', probe: 'SELECT 1' },
   bindings: { documents: 'configured', assets: 'configured', ingestionWorkflow: 'not_configured', tallyConnections: 'not_configured' },
 };
 
 describe('health contract', () => {
+  it('rejects mock claims outside explicit local environments', () => {
+    expect(runtimeSchema.safeParse({ environment: 'production', extraction: 'mock_stub', tally: 'unavailable' }).success).toBe(false);
+    expect(runtimeSchema.safeParse({ environment: 'unconfigured', extraction: 'unavailable', tally: 'mock_stub' }).success).toBe(false);
+  });
   it('accepts verified D1 health without requiring future optional services', () => {
     expect(healthSchema.safeParse(healthy).success).toBe(true);
   });

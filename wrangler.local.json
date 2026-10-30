@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rallie-local-only",
+  "main": "apps/api/src/local.ts",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "apps/web/dist", "binding": "ASSETS", "run_worker_first": true },
+  "migrations": [{ "tag": "foundation-smoke-v1", "new_sqlite_classes": ["FoundationSmokeObject"] }],
+  "env": {
+    "dev": {
+      "name": "rallie-dev",
+      "d1_databases": [{ "binding": "DB", "database_name": "rallie-dev", "database_id": "00000000-0000-0000-0000-000000000001", "migrations_dir": "migrations", "remote": false }],
+      "r2_buckets": [{ "binding": "DOCUMENTS", "bucket_name": "rallie-local-dev-documents", "remote": false }],
+      "workflows": [{ "binding": "INGESTION_WORKFLOW", "name": "rallie-dev-foundation-smoke", "class_name": "FoundationSmokeWorkflow" }],
+      "durable_objects": { "bindings": [{ "name": "TALLY_CONNECTIONS", "class_name": "FoundationSmokeObject" }] }
+    },
+    "test": {
+      "name": "rallie-test",
+      "d1_databases": [{ "binding": "DB", "database_name": "rallie-test", "database_id": "00000000-0000-0000-0000-000000000002", "migrations_dir": "migrations", "remote": false }],
+      "r2_buckets": [{ "binding": "DOCUMENTS", "bucket_name": "rallie-local-test-documents", "remote": false }],
+      "workflows": [{ "binding": "INGESTION_WORKFLOW", "name": "rallie-test-foundation-smoke", "class_name": "FoundationSmokeWorkflow" }],
+      "durable_objects": { "bindings": [{ "name": "TALLY_CONNECTIONS", "class_name": "FoundationSmokeObject" }] }
+    }
+  }
+}

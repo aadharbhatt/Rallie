@@ -1,0 +1,43 @@
+services:
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    init: true
+    command: ["node", "scripts/start-local-api.mjs", "--env", "${RALLIE_LOCAL_ENV:-dev}", "--ip", "0.0.0.0"]
+    environment:
+      RALLIE_MOCK_EXTRACTION: ${RALLIE_MOCK_EXTRACTION:-false}
+      RALLIE_MOCK_TALLY: ${RALLIE_MOCK_TALLY:-false}
+      RALLIE_OMIT_BINDING: ${RALLIE_OMIT_BINDING:-none}
+    ports:
+      - "127.0.0.1:${RALLIE_API_PORT:-8788}:8787"
+    volumes:
+      - state:/workspace/.local
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8787/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
+    stop_grace_period: 15s
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    init: true
+    working_dir: /workspace/apps/web
+    command: ["node", "../../node_modules/vite/bin/vite.js", "--host", "0.0.0.0"]
+    environment:
+      API_PROXY_TARGET: http://worker:8787
+    ports:
+      - "127.0.0.1:${RALLIE_WEB_PORT:-5174}:5173"
+    depends_on:
+      worker:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5173/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+volumes:
+  state:

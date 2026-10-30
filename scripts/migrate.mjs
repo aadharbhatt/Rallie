@@ -20,8 +20,9 @@ export function migrationPlan(args) {
   const localPath = relative(resolve(root, '.local'), persistence);
   if (!localPath || localPath.startsWith('..') || isAbsolute(localPath)) throw new Error('Persistence must be a directory inside .local/; refusing an unsafe target.');
   const base = ['--config', resolve(root, 'wrangler.jsonc'), '--env', environment];
-  const command = (operation) => [...base, 'd1', 'migrations', operation, 'DB', '--local', '--persist-to', persistence];
-  const versions = [...base, 'd1', 'execute', 'DB', '--local', '--persist-to', persistence, '--command', 'SELECT name, applied_at FROM d1_migrations ORDER BY id'];
+  const environmentFile = `--env-file=${resolve(root, 'config/local-vars.txt')}`;
+  const command = (operation) => [...base, 'd1', 'migrations', operation, 'DB', '--local', '--persist-to', persistence, environmentFile];
+  const versions = [...base, 'd1', 'execute', 'DB', '--local', '--persist-to', persistence, '--command', 'SELECT name, applied_at FROM d1_migrations ORDER BY id', environmentFile];
   return { environment, persistence, commands: action === 'apply' ? [command('apply'), command('list'), versions] : [command('list')] };
 }
 

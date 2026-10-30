@@ -1,5 +1,7 @@
 # RAL-001 — typed foundation and verification
 
+**2026-10-30 follow-up:** this document preserves the RAL-001 implementation/evidence snapshot. [RAL-002 local runtime](LOCAL-RUNTIME.md) adds a separate Docker/local entrypoint, real emulated R2/Workflow/DO smoke probes, explicit runtime/mock DTO fields and guarded startup. Its scope and newer test totals do not retroactively claim those features for RAL-001. The production entrypoint still excludes local probe implementations.
+
 ## Architecture decision
 
 Use **thin typed SQL** against Cloudflare D1, with **Zod** validation at HTTP/browser boundaries. No ORM, repository abstraction, server process, or additional production service is introduced.

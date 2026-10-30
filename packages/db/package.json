@@ -2,5 +2,8 @@
   "name": "@rallie/db",
   "version": "0.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "scripts": { "typecheck": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json" },
+  "exports": "./src/index.ts",
+  "devDependencies": { "@cloudflare/workers-types": "^4.20250401.0" }
 }

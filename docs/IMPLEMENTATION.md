@@ -78,7 +78,7 @@ Every row's owner is **agent/unassigned** until explicitly assigned. Parent deta
 
 | ID | Slice / deliverable | Status | Owner |
 |---|---|---|---|
-| RAL-001 | Foundation: workspace and typed boundaries | TODO | agent/unassigned |
+| RAL-001 | Foundation: workspace and typed boundaries | DONE | GitHub Copilot |
 | RAL-002 | Foundation: Docker local Cloudflare runtime | TODO | agent/unassigned |
 | RAL-003 | Foundation: shell and health | TODO | agent/unassigned |
 | RAL-004 | Foundation: environment and migration isolation | TODO | agent/unassigned |
@@ -209,13 +209,13 @@ These are proposed implementation decisions, not unstated requirements from the 
 ## 1. Foundation slice — deploy one empty Rallie
 
 ### RAL-001 — Establish the typed monorepo and architectural boundaries
-- **Status:** TODO; **Owner:** agent/unassigned; **Dependencies:** none.
+- **Status:** DONE; **Owner:** GitHub Copilot; **Dependencies:** none. Started and verified 2026-10-29; uncommitted working tree based on 8cc8a1b, no new commit/PR. Scope: FND-001–003 only.
 - **Scope:** React/TypeScript/Vite web with app/components/features/lib; Worker API, packages for domain, DB and API contracts; migrations and Wrangler configuration. Reserve bridge and tally-protocol packages for their later slice. Pick Drizzle or thin typed SQL and Zod-style validation; no speculative infrastructure.
 - **UI / keyboard:** Minimal accessible landing/loading/error surface; keyboard navigation works before adding domain screens.
 - **API / security:** Define typed `/health` contract and safe error envelope; keep secrets and server bindings out of browser bundles.
 - **DB / migrations:** Establish migration runner/version tracking only; no catalogue, quote or Tally tables yet.
-- **Acceptance:** [ ] Typecheck/build contracts and web/Worker boundaries. [ ] Production build contains no credentials. [ ] Directory layout and architectural exclusions are documented in implementation evidence.
-- **Evidence / notes:** _Pending: commit, decisions, checks, limitations._
+- **Acceptance:** [x] Typecheck/build contracts and web/Worker boundaries. [x] Production build contains no credentials. [x] Directory layout and architectural exclusions are documented in implementation evidence.
+- **Evidence / notes:** [RAL-001 evidence and applicability review](FOUNDATION.md); all mapped children FND-001–003 verified. `npm ci`, separate package/tool typechecks, 65 unit/contract tests, web build + Worker dry-run and browser credential/server-marker audit passed; 1 real D1 emulator replay/repeat/upgrade integration passed; all 15 Playwright tests passed against built assets + Worker/D1; audit reported 0 vulnerabilities. Thin typed SQL + Zod selected. No secrets supplied or source maps emitted; bundle signature scanning is not a general credential-proof mechanism. Migration unchanged: `0001_foundation.sql` only. No Docker/R2/Workflow/DO/deployment completion or authenticated domain functionality is claimed; later parents remain TODO. Commit/PR absent explicitly, changes remain in the working tree.
 
 ### RAL-002 — Make local web/API runnable in Docker with Cloudflare emulation
 - **Status:** TODO; **Owner:** agent/unassigned; **Dependencies:** RAL-001.

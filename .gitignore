@@ -1,5 +1,7 @@
 node_modules/
-package-lock.json
+# The root lockfile is canonical for the npm workspace; ignore old standalone locks.
+apps/*/package-lock.json
+packages/*/package-lock.json
 dist/
 build/
 .vite/
@@ -11,3 +13,6 @@ build/
 coverage/
 playwright-report/
 test-results/
+.local/
+.dev.vars
+.dev.vars.*

@@ -16,37 +16,37 @@ Each ticket is intended as one independently verifiable increment, normally no m
 ## Support area: typed bootstrap and migration runner (not a screen)
 
 ### FND-001 — Enforce browser, Worker and shared-package boundaries
-- **Status:** TODO
-- **Owner:** unassigned
+- **Status:** DONE (started and verified 2026-10-29; uncommitted working tree based on 8cc8a1b; no PR yet)
+- **Owner:** GitHub Copilot
 - **Parents:** RAL-001 ([requirement](../IMPLEMENTATION.md#ral-001--establish-the-typed-monorepo-and-architectural-boundaries)).
 - **Depends on:** None.
-- **UI checklist:** [ ] Minimal web entry has a heading, keyboard-visible focus and readable failure surface; no domain screen implementation.
-- **API/backend checklist:** [ ] Typecheck React/TypeScript/Vite, Worker, domain and API-contract packages separately; choose Drizzle or thin typed SQL plus schema validation; reserve bridge packages without implementing them.
-- **DB checklist:** [ ] Document migration ownership only; introduce no catalogue, quotation or Tally tables.
+- **UI checklist:** [x] Minimal web entry has a heading, keyboard-visible focus and readable failure surface; no domain screen implementation.
+- **API/backend checklist:** [x] Typecheck React/TypeScript/Vite, Worker, domain and API-contract packages separately; choose Drizzle or thin typed SQL plus schema validation; reserve bridge packages without implementing them.
+- **DB checklist:** [x] Document migration ownership only; introduce no catalogue, quotation or Tally tables.
 - **Verify:** 1. Build/typecheck a clean checkout: boundaries pass. 2. Deliberately import server bindings into the web: boundary check fails; inspect output for secrets.
-- **Evidence:** pending.
+- **Evidence:** [Dated evidence, architecture and limitations](../FOUNDATION.md): lockfile-backed `npm ci`, separate package/tool typechecks, 65 unit/contract tests including deliberately forbidden server-binding imports, web build and Worker dry-run, browser bundle scan, and 15 Playwright tests passed. Thin typed SQL + Zod chosen; bridge/protocol packages documented as reserved only. Existing preview domain UI preserved, not completed production behavior. No domain migration added.
 
 ### FND-002 — Define machine-readable health and safe error contracts
-- **Status:** TODO
-- **Owner:** unassigned
+- **Status:** DONE (started and verified 2026-10-29; uncommitted working tree based on 8cc8a1b; no PR yet)
+- **Owner:** GitHub Copilot
 - **Parents:** RAL-001, RAL-003 ([requirements](../IMPLEMENTATION.md)).
 - **Depends on:** FND-001.
-- **UI checklist:** [ ] Document how the shell distinguishes unavailable API from an invalid response, without showing stacks.
-- **API/backend checklist:** [ ] Define `GET /health` service/build/readiness DTO and a stable JSON error envelope; distinguish shallow liveness from dependency readiness; specify status codes and non-secret diagnostic categories.
+- **UI checklist:** [x] Document how the shell distinguishes unavailable API from an invalid response, without showing stacks.
+- **API/backend checklist:** [x] Define `GET /health` service/build/readiness DTO and a stable JSON error envelope; distinguish shallow liveness from dependency readiness; specify status codes and non-secret diagnostic categories.
 - **DB checklist:** None; contract definition must not require domain tables.
 - **Verify:** 1. Validate healthy/unready/error fixtures against shared schemas. 2. Assert fixtures contain no credentials, account/resource IDs or exception stacks.
-- **Evidence:** pending.
+- **Evidence:** [Health/error contract and executed evidence](../FOUNDATION.md): strict healthy/unready/error fixtures, safe UUID request IDs, non-reflected exception text, shallow `/health/live`, readiness `/health`, timeout/missing/error probes verified. Worker and schema tests passed within 65-test run; Playwright verified unavailable versus invalid response, loading/degraded/retry, and real local D1 readiness. Binding presence explicitly does not claim optional-service connectivity. UI saving/permissions/tenant tests N/A: no auth/mutation feature exists.
 
 ### FND-003 — Replay foundation migrations safely
-- **Status:** TODO
-- **Owner:** unassigned
+- **Status:** DONE (started and verified 2026-10-29; uncommitted working tree based on 8cc8a1b; no PR yet)
+- **Owner:** GitHub Copilot
 - **Parents:** RAL-001, RAL-004 ([requirements](../IMPLEMENTATION.md)).
 - **Depends on:** FND-001.
 - **UI checklist:** None; migration commands are non-screen support.
-- **API/backend checklist:** [ ] Provide explicit environment selection and migration-version reporting; reject implicit production reset/seed operations.
-- **DB checklist:** [ ] Establish migration runner/version tracking; replay empty local D1 and forward-upgrade a prior foundation state; deterministic seeds allowed only in dev/test.
+- **API/backend checklist:** [x] Provide explicit environment selection and migration-version reporting; reject implicit production reset/seed operations.
+- **DB checklist:** [x] Establish migration runner/version tracking; replay empty local D1 and forward-upgrade a prior foundation state; deterministic seeds allowed only in dev/test.
 - **Verify:** 1. Apply twice to an empty isolated D1: second run is harmless. 2. Exercise reset/seed protection with a production configuration: refuse before any write.
-- **Evidence:** pending.
+- **Evidence:** [Migration safety and evidence](../FOUNDATION.md): `npm run test:migrations` passed 1 real local D1 integration covering empty apply, repeated apply, Wrangler ledger, unchanged foundation-only schema, pre-runner bootstrap upgrade preserving sentinel data. Unit tests refuse missing/prod/staging environments, remote flags, reset/seed and unsafe paths before any command executes. No seed/reset implementation or production access. Existing `0001_foundation.sql` unchanged. UI/keyboard and role/tenant checks N/A for this non-screen local runner; full resource isolation remains FND-008/010.
 
 ## Support area: reproducible local Cloudflare runtime (not a screen)
 

@@ -8,9 +8,9 @@ test('real API health and foundation boundaries', async ({ page, request }) => {
   expect(health.database.status).toBe('ok');
   const missing = await request.get('/api/not-implemented', { headers: { Accept: 'text/html' } });
   expect(missing.status()).toBe(404);
-  expect(await missing.json()).toMatchObject({ error: 'not_found' });
+  expect(await missing.json()).toMatchObject({ code: 'not_found' });
   await page.goto('/');
-  await expect(page.getByText('Foundation preview', { exact: true })).toBeVisible();
+  await expect(page.getByText('Local workspace', { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Ready when you are.' })).toBeVisible();
   await expect(page.getByText('API responding · database reachable', { exact: true })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link')).toHaveCount(5);
@@ -196,6 +196,7 @@ test('API loading, degraded health, failure, and retry are honest', async ({ pag
     await gate;
     await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({
       service: 'rallie-api', stage: 'foundation', status: 'degraded', checkedAt: new Date().toISOString(),
+      build: { version: '0.0.0' }, readiness: 'unready',
       database: { status: 'error', probe: 'SELECT 1' },
       bindings: { documents: 'not_configured', assets: 'configured', ingestionWorkflow: 'not_configured', tallyConnections: 'not_configured' },
     }) });
@@ -303,6 +304,7 @@ test('blueprint typography and start-page geometry stay consistent', async ({ pa
 test('connection diagnostics are available without overwhelming the default view', async ({ page }) => {
   await page.route('**/health', (route) => route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({
     service: 'rallie-api', stage: 'foundation', status: 'degraded', checkedAt: new Date().toISOString(),
+    build: { version: '0.0.0' }, readiness: 'unready',
     database: { status: 'error', probe: 'SELECT 1' },
     bindings: { documents: 'not_configured', assets: 'configured', ingestionWorkflow: 'not_configured', tallyConnections: 'not_configured' },
   }) }));
@@ -311,6 +313,19 @@ test('connection diagnostics are available without overwhelming the default view
   await expect(page.getByText('Probe failed', { exact: true })).not.toBeVisible();
   await page.getByText('Connection details', { exact: true }).click();
   await expect(page.getByText('Probe failed', { exact: true })).toBeVisible();
+});
+
+test('invalid API responses are distinguished from network failures without exposing details', async ({ page }) => {
+  await page.route('**/health', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ stack: 'SECRET internal stack', accountId: 'private' }) }));
+  await page.goto('/');
+  await expect(page.getByRole('alert')).toContainText('API unavailable');
+  await page.getByText('Connection details', { exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('The API returned an invalid health response.');
+  await expect(page.getByRole('alert')).not.toContainText('SECRET');
+  await page.unroute('**/health');
+  await page.route('**/health', (route) => route.abort());
+  await page.getByRole('button', { name: 'Refresh', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('The API could not be reached.');
 });
 
 test('workbench routes reflow without page or main horizontal overflow', async ({ page }) => {

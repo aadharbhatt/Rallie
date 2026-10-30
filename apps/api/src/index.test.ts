@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { healthSchema } from '../../../packages/api-contracts/src/index';
+import { apiErrorSchema, healthSchema, livenessSchema } from '@rallie/api-contracts';
 import { handleRequest } from './index';
 import type { Env } from './env';
 
@@ -11,6 +11,14 @@ function database(result: unknown = { ok: 1 }): NonNullable<Env['DB']> {
 afterEach(() => vi.useRealTimers());
 
 describe('foundation Worker', () => {
+  it('reports shallow liveness without probing missing or unhealthy D1', async () => {
+    const DB = database();
+    const response = await handleRequest(request('/health/live'), { DB });
+    expect(response.status).toBe(200);
+    expect(livenessSchema.parse(await response.json()).status).toBe('alive');
+    expect(DB.prepare).not.toHaveBeenCalled();
+    expect((await handleRequest(request('/health/live'), {})).status).toBe(200);
+  });
   it('probes D1 with SELECT 1 and reports optional bindings separately', async () => {
     const DB = database();
     const response = await handleRequest(request('/health'), { DB });
@@ -77,7 +85,9 @@ describe('foundation Worker', () => {
     const response = await handleRequest(request(path, { headers: { Accept: 'text/html' } }), { ASSETS: { fetch } as unknown as Env['ASSETS'] });
     expect(response.status).toBe(404);
     expect(response.headers.get('Content-Type')).toContain('application/json');
-    expect(await response.json()).toMatchObject({ error: 'not_found' });
+    const body = apiErrorSchema.parse(await response.json());
+    expect(body.code).toBe('not_found');
+    expect(body.requestId).toBe(response.headers.get('X-Request-ID'));
     expect(fetch).not.toHaveBeenCalled();
   });
 
@@ -97,6 +107,12 @@ describe('foundation Worker', () => {
     const fetch = vi.fn(async () => { throw new Error('internal'); });
     const response = await handleRequest(request('/'), { ASSETS: { fetch } as unknown as Env['ASSETS'] });
     expect(response.status).toBe(503);
-    expect(await response.json()).toEqual({ error: 'assets_unavailable' });
+    expect(apiErrorSchema.parse(await response.json()).code).toBe('assets_unavailable');
+  });
+  it.each(['/health', '/health/live', '/unknown', '/api/unknown'])('returns a safe error envelope for %s', async (path) => {
+    const response = await handleRequest(request(path, { method: 'POST', headers: { 'X-Request-ID': 'SECRET caller input' } }), {});
+    const body = apiErrorSchema.parse(await response.json());
+    expect(body.requestId).toBe(response.headers.get('X-Request-ID'));
+    expect(JSON.stringify(body)).not.toContain('SECRET');
   });
 });

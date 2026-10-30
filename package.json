@@ -1,0 +1,27 @@
+{
+  "name": "rallie",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": ["apps/*", "packages/*"],
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "check:boundaries": "node scripts/check-boundaries.mjs",
+    "typecheck": "npm run check:boundaries && npm run typecheck --workspaces && node node_modules/typescript/bin/tsc -p tsconfig.tools.json",
+    "test": "node node_modules/vitest/vitest.mjs run",
+    "test:e2e": "node node_modules/@playwright/test/cli.js test --config tests/playwright.config.ts",
+    "test:migrations": "node --test scripts/migrations.integration.test.mjs",
+    "build": "npm run check:boundaries && npm run build --workspace @rallie/web && node node_modules/wrangler/bin/wrangler.js deploy --dry-run --env dev --outdir .local/worker-build && node scripts/check-build.mjs",
+    "dev": "npm run dev --workspace @rallie/web",
+    "dev:api": "node node_modules/wrangler/bin/wrangler.js dev --env dev --local --persist-to .local/state/dev",
+    "db:migrate": "node scripts/migrate.mjs apply",
+    "db:status": "node scripts/migrate.mjs status"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.1",
+    "@types/node": "^22.15.0",
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.12",
+    "wrangler": "^4.0.0"
+  }
+}

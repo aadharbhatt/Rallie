@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { healthSchema, type HealthResponse } from '@rallie/api-contracts';
 
 type HealthState = { state: 'loading' } | { state: 'loaded'; data: HealthResponse } | { state: 'error'; message: string };
 
-export function useHealth() {
+export function useHealthRequest() {
   const [health, setHealth] = useState<HealthState>({ state: 'loading' });
   const current = useRef<AbortController | null>(null);
   const refresh = useCallback(async () => {
@@ -11,7 +11,7 @@ export function useHealth() {
     const controller = new AbortController();
     current.current = controller;
     setHealth({ state: 'loading' });
-    const timeout = setTimeout(() => controller.abort('timeout'), 6_000);
+    const timeout = setTimeout(() => controller.abort('timeout'), 10_000);
     let responseReceived = false;
     try {
       const response = await fetch('/health', { signal: controller.signal, cache: 'no-store', headers: { Accept: 'application/json' } });
@@ -30,4 +30,13 @@ export function useHealth() {
   }, []);
   useEffect(() => { void refresh(); return () => { current.current?.abort(); current.current = null; }; }, [refresh]);
   return { health, refresh };
+}
+
+export const HealthContext = createContext<ReturnType<typeof useHealthRequest> | null>(null);
+
+/** One shell-owned request; navigating must not restart bootstrap or lose status. */
+export function useHealth() {
+  const context = useContext(HealthContext);
+  if (!context) throw new Error('HealthContext is required.');
+  return context;
 }

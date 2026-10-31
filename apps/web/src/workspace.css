@@ -1,5 +1,17 @@
-.runtime-notice { margin-top: 16px; padding: 12px 0; border-top: 1px solid var(--border, #333); font-size: 13px; }
+.runtime-notice { margin: 0 0 20px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; font-size: 12px; }
 .runtime-notice p { margin: 6px 0 0; color: var(--muted, #aaa); }
+.workspace-status { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 20px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; }
+.preview-notice { margin: 0 0 20px; font-size: 12px; }
+.sidebar .mobile-navigation-trigger { display: none; }
+.mobile-navigation nav { display: grid; gap: 8px; padding: 16px; }
+.mobile-navigation .nav-item { min-height: 44px; }
+.route-failure { max-width: 640px; padding-block: 24px; }
+@media (max-width: 760px) {
+  .sidebar .mobile-navigation-trigger { display: inline-flex; margin: 0 auto 12px; min-height: 44px; min-width: 44px; }
+  .sidebar { overflow-y: auto !important; }
+  .sidebar .nav-item { min-height: 44px !important; }
+  .mobile-navigation { width: min(320px, calc(100vw - 24px)); }
+}
 /* AI Studio-inspired visual rhythm, adapted to a commercial workbench. */
 :root {
   color-scheme: dark;

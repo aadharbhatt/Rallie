@@ -80,7 +80,7 @@ Every row's owner is **agent/unassigned** until explicitly assigned. Parent deta
 |---|---|---|---|
 | RAL-001 | Foundation: workspace and typed boundaries | DONE | GitHub Copilot |
 | RAL-002 | Foundation: Docker local Cloudflare runtime | DONE | GitHub Copilot |
-| RAL-003 | Foundation: shell and health | TODO | agent/unassigned |
+| RAL-003 | Foundation: shell and health | DONE | GitHub Copilot |
 | RAL-004 | Foundation: environment and migration isolation | TODO | agent/unassigned |
 | RAL-005 | Foundation: automated checks and local gate | TODO | agent/unassigned |
 | RAL-006 | Foundation: credential-gated deployment | TODO | agent/unassigned |
@@ -227,13 +227,13 @@ These are proposed implementation decisions, not unstated requirements from the 
 - **Evidence / notes:** [RAL-002 setup, executed checks and limits](LOCAL-RUNTIME.md); all mapped children FND-004–007 verified. Clean Linux image-layer install and healthy Docker web/Worker startup; real D1/R2 fixture retention across restart, completed local Workflow and persisted DO request, removed Workflow/DO binding failures, independent default-off flags and test-volume reset/replay passed via `npm run test:runtime`. 96 unit/contract tests, 17 Docker-backed Playwright tests, real D1 migration replay/upgrade, package typechecks and web/production Worker dry-run/audits passed. Actual manual Docker outage showed unavailable (no fallback); independent stub labels observed. Docker CLI 29.4.1/Engine 29.2.1, Compose 5.1.3, container Node 22.23.4, Wrangler 4.154.0 on macOS/Colima arm64. No new domain migration or real extraction/Tally; smoke handlers excluded from production entrypoint. Source snapshots require rebuild. Full staging/production isolation, deployment and real integrations remain separate gates.
 
 ### RAL-003 — Deliver application shell and health endpoint
-- **Status:** TODO; **Owner:** agent/unassigned; **Dependencies:** RAL-001, RAL-002.
+- **Status:** DONE; **Owner:** GitHub Copilot; **Dependencies:** RAL-001, RAL-002. Started 2026-10-30 and verified this session; uncommitted working tree based on fb34baf, no new commit/PR. Scope: FND-009 and foundation acceptance of SHL-001–007, SHL-009–010; no identity or domain functionality. Real session/staging extensions remain their later parent gates.
 - **Scope:** Left navigation Dashboard, Catalogue, Quotations, Tally, Settings; Admin later gated by platform claim. No charts, Compare mode or extra role-specific app. Feature placeholders are honest and non-actionable.
 - **UI / keyboard:** Skip link, landmark navigation, active-route state, route loading/error boundary, narrow-layout navigation, visible keyboard focus. Owner-only controls are not yet represented as working features.
 - **API / security:** `GET /health` returns minimal service/build/readiness status without secrets, resource IDs or diagnostic stack traces. Define shallow liveness versus dependency readiness for local checks.
 - **DB / migrations:** No domain migration; health uses only safe minimal binding checks.
-- **Acceptance:** [ ] SPA deep links work with Worker routing and API errors are not served HTML. [ ] Health is machine-readable. [ ] Keyboard-only route navigation and responsive shell pass.
-- **Evidence / notes:** _Pending: screenshots, route tests, health response._
+- **Acceptance:** [x] SPA deep links work with Worker routing and API errors are not served HTML. [x] Health is machine-readable. [x] Keyboard-only route navigation and responsive shell pass.
+- **Evidence / notes:** [Shell/health evidence and manual validation](SHELL-HEALTH.md): 100 unit/contract tests, 27 built-asset Docker Worker browser tests, 12 repeated focus/recovery checks, real D1 replay/repeat/upgrade, isolated four-binding runtime verification, typechecks/build/audits and diff checks passed. Route-local chunk/render errors preserve the shell and retry without full reload; mobile drawer/focus, Save-Data, cold-start timeout/retry, editable/IME-safe shortcuts and shared runtime/readiness status verified. Actual API stop/restart showed unavailable then recovered without mock fallback. No migration changes; existing safe health implementation reused. 320px drawer screenshot and desktop/narrow browser inspection recorded. Build warnings/initial chunk size, physical zoom/screen-reader certification, real session/staging/deployment and persisted domain work remain explicit limitations; RAL-004–006 are not completed by this evidence.
 
 ### RAL-004 — Separate dev, staging and production resources and migrations
 - **Status:** TODO; **Owner:** agent/unassigned; **Dependencies:** RAL-002, RAL-003.

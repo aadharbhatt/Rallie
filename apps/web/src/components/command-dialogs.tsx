@@ -6,7 +6,7 @@ import { Dialog } from './ui/dialog';
 
 export type DialogKind = 'command' | 'help' | null;
 
-export function CommandDialogs({ kind, onClose }: { kind: DialogKind; onClose: () => void }) {
+export function CommandDialogs({ kind, onClose, shortcutsEnabled, onShortcutsChange }: { kind: DialogKind; onClose: () => void; shortcutsEnabled: boolean; onShortcutsChange: (enabled: boolean) => void }) {
   const searchRef = useRef<HTMLInputElement>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
   const navigating = useRef(false);
@@ -38,6 +38,6 @@ export function CommandDialogs({ kind, onClose }: { kind: DialogKind; onClose: (
       <ul className="command-results" id="command-results" role="listbox" aria-label="Pages">{matches.map(({ to, label, detail, icon: Icon }, index) => <li key={to} id={`command-${index}`} role="option" aria-selected={index === active} className={index === active ? 'selected' : ''} onMouseMove={() => setActive(index)} onClick={() => choose(to)}><Icon size={20} aria-hidden="true" /><span><strong>{label}</strong><small>{detail}</small></span><ArrowRight size={16} aria-hidden="true" /></li>)}</ul>
       {matches.length === 0 && <p className="empty-message" role="status">No pages match “{query}”. Try Catalogue or Settings.</p>}
       <div className="dialog-footer"><span><kbd>↑</kbd> <kbd>↓</kbd> to explore · <kbd>Enter</kbd> to open</span><span><kbd>Esc</kbd> to close</span></div>
-    </> : <div className="shortcut-help"><p>Move around without leaving the keyboard.</p><dl><div><dt>Open page finder</dt><dd><kbd>Ctrl</kbd> / <kbd>⌘</kbd> + <kbd>K</kbd></dd></div><div><dt>Toggle desktop sidebar</dt><dd><kbd>Ctrl</kbd> / <kbd>⌘</kbd> + <kbd>B</kbd></dd></div><div><dt>Show this help</dt><dd><kbd>?</kbd></dd></div><div><dt>Close a dialog</dt><dd><kbd>Esc</kbd></dd></div><div><dt>Move through controls</dt><dd><kbd>Tab</kbd></dd></div></dl><p className="muted">The page finder works while editing a field. Sidebar and help shortcuts do not interrupt typing. Browser search, refresh, and new-tab shortcuts are left alone.</p></div>}
+    </> : <div className="shortcut-help"><p>Move around without leaving the keyboard.</p><dl><div><dt>Open page finder</dt><dd><kbd>Ctrl</kbd> / <kbd>⌘</kbd> + <kbd>K</kbd></dd></div><div><dt>Toggle desktop sidebar</dt><dd><kbd>Ctrl</kbd> / <kbd>⌘</kbd> + <kbd>B</kbd></dd></div><div><dt>Show this help</dt><dd><kbd>?</kbd></dd></div><div><dt>Close a dialog</dt><dd><kbd>Esc</kbd></dd></div><div><dt>Move through controls</dt><dd><kbd>Tab</kbd></dd></div></dl><label><input type="checkbox" checked={shortcutsEnabled} onChange={(event) => onShortcutsChange(event.target.checked)} /> Enable navigation shortcuts for this workspace visit</label><p className="muted">Navigation shortcuts do not interrupt editable fields or composition. Page-finder and help buttons always work. Browser search, refresh, and new-tab shortcuts are left alone. This preference is not saved to an account.</p></div>}
   </Dialog>;
 }

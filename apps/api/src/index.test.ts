@@ -38,6 +38,19 @@ describe('foundation Worker', () => {
     expect(healthSchema.parse(await response.json()).database.status).toBe('not_configured');
   });
 
+  it('keeps readiness unready and liveness alive for the same failing binding without leaking details', async () => {
+    const DB = { prepare: vi.fn(() => { throw new Error('PRIVATE_BINDING_IDENTIFIER'); }) } as unknown as NonNullable<Env['DB']>;
+    const readiness = await handleRequest(request('/health'), { DB });
+    const text = await readiness.text();
+    expect(readiness.status).toBe(503);
+    expect(healthSchema.parse(JSON.parse(text)).readiness).toBe('unready');
+    expect(text).not.toContain('PRIVATE_BINDING_IDENTIFIER');
+    const liveness = await handleRequest(request('/health/live'), { DB });
+    expect(liveness.status).toBe(200);
+    expect(livenessSchema.parse(await liveness.json()).status).toBe('alive');
+    expect(DB.prepare).toHaveBeenCalledTimes(1);
+  });
+
   it('reports binding presence without pretending to test optional services', async () => {
     const response = await handleRequest(request('/health'), {
       DB: database(),

@@ -2,6 +2,9 @@ import { createBrowserRouter } from 'react-router-dom';
 import { Shell } from './shell';
 import { RouteError, RouteSkeleton } from '../components/route-feedback';
 import { navigation } from './navigation';
+import { LazyPage } from '../components/lazy-page';
+
+const loadNotFound = () => import('../features/not-found');
 
 export const router = createBrowserRouter([
   {
@@ -10,8 +13,11 @@ export const router = createBrowserRouter([
     ErrorBoundary: RouteError,
     HydrateFallback: RouteSkeleton,
     children: [
-      ...navigation.map((item) => item.to === '/' ? { index: true as const, lazy: item.load } : { path: item.to.slice(1), lazy: item.load }),
-      { path: '*', lazy: () => import('../features/not-found') },
+      ...navigation.map((item) => ({
+        ...(item.to === '/' ? { index: true as const } : { path: item.to.slice(1) }),
+        element: <LazyPage key={item.to} load={item.load} />,
+      })),
+      { path: '*', element: <LazyPage load={loadNotFound} /> },
     ],
   },
 ]);

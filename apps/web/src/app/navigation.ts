@@ -7,3 +7,14 @@ export const navigation = [
   { to: '/tally', label: 'Tally', icon: Cable, detail: 'Integration scope & availability', load: () => import('../features/tally') },
   { to: '/settings', label: 'Settings', icon: Settings2, detail: 'Preview boundaries & preferences', load: () => import('../features/settings') },
 ];
+
+/** Navigation is not authorization. Every domain screen is a fixture/information preview. */
+export const moduleAvailability = {
+  '/': 'foundation', '/catalogue': 'fixture_preview', '/quotations': 'fixture_preview',
+  '/tally': 'unavailable', '/settings': 'information_only',
+} as const;
+
+export function prefetchPage(load: () => Promise<unknown>) {
+  const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+  if (!connection?.saveData) void load().catch(() => {});
+}

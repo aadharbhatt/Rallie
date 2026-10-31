@@ -108,15 +108,15 @@ Each ticket is intended as one independently verifiable increment, normally no m
 - **Evidence:** pending.
 
 ### FND-009 — Serve safe liveness and dependency readiness
-- **Status:** TODO
-- **Owner:** unassigned
+- **Status:** DONE (started 2026-10-30; verified this session; uncommitted working tree based on fb34baf, no new commit/PR)
+- **Owner:** GitHub Copilot
 - **Parents:** RAL-003 ([requirement](../IMPLEMENTATION.md)).
-- **Depends on:** FND-002, FND-004, FND-008.
-- **UI checklist:** [ ] Health failure copy distinguishes unavailable backend from a failed domain action; no working-looking domain placeholders.
-- **API/backend checklist:** [ ] Implement `GET /health` against agreed schema; readiness uses bounded safe binding checks, liveness does not mutate data; unexpected errors retain JSON envelope.
-- **DB checklist:** [ ] Minimal readiness query only; no domain migrations or sensitive query results.
+- **Depends on:** FND-002, FND-004. Dependency clarification for RAL-003: consume existing guarded dev/test runtime configuration; FND-008's full staging/production isolation is a later RAL-004 gate, not a circular prerequisite for RAL-003 (RAL-004 itself depends on RAL-003).
+- **UI checklist:** [x] Health failure copy distinguishes unavailable backend from a failed domain action; existing fixture controls explicitly preview-only, no claimed working domain service.
+- **API/backend checklist:** [x] Reuse verified `GET /health` schema/implementation; bounded 2s D1 check, distinct shallow `/health/live`, safe JSON errors and no-store responses.
+- **DB checklist:** [x] Read-only `SELECT 1`; no domain migration or sensitive query result.
 - **Verify:** 1. Healthy service returns machine-readable success. 2. Disconnect a binding: readiness becomes unready without leaking stack/resource identifiers; liveness semantics remain as specified.
-- **Evidence:** pending.
+- **Evidence:** [RAL-003 evidence](../SHELL-HEALTH.md): 100 unit/contract tests include missing/failing/stalled binding, same-binding readiness 503 versus liveness 200 and exception sanitization; real Docker Worker health and API JSON verified in 27 passing browser tests. Actual API outage/recovery inspected. Full resource/origin isolation remains FND-008; optional bindings report presence, with real connectivity tested separately by the isolated runtime gate. No new migration.
 
 ### FND-010 — Document forward migration and recovery safeguards
 - **Status:** TODO

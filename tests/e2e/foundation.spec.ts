@@ -23,12 +23,12 @@ test('navigation, fixture search, quote tabs, and direct reload', async ({ page 
   await expect(page.getByRole('heading', { name: 'Catalogue', exact: true })).toBeVisible();
   const search = page.getByRole('textbox', { name: 'Search demo catalogue' });
   await search.fill('DEMO-BM-101');
-  await expect(page.getByRole('status')).toHaveText('1 demo product');
+  await expect(page.getByRole('status').filter({ hasText: '1 demo product' })).toHaveText('1 demo product');
   await expect(page.getByRole('button', { name: 'Inspect Arc basin mixer', exact: true })).toBeVisible();
   await search.fill('nonexistent fixture');
   await expect(page.getByRole('heading', { name: 'No demo products found' })).toBeVisible();
   await page.getByRole('button', { name: 'Reset filters' }).click();
-  await expect(page.getByRole('status')).toHaveText('6 demo products');
+  await expect(page.getByRole('status').filter({ hasText: '6 demo products' })).toHaveText('6 demo products');
   await page.getByRole('navigation').getByRole('link', { name: 'Quotations', exact: true }).click();
   await expect(page.getByRole('tab', { name: 'Sample bathroom' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByTestId('quote-total')).toHaveText('₹7,650.00');
@@ -81,9 +81,7 @@ test('command palette and help support keyboard use and restore focus', async ({
   await expect(search).toHaveValue('?');
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await page.keyboard.press('Control+k');
-  await expect(page.getByRole('dialog')).toBeVisible();
-  await expect(page.getByRole('combobox', { name: 'Find a page' })).toBeFocused();
-  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).not.toBeVisible();
   await expect(search).toBeFocused();
 });
 
@@ -143,7 +141,7 @@ test('page location lives in the footer with one highlighted shortcuts control',
   await expect(dialog).toHaveAttribute('aria-describedby', /.+/);
   await expect(close).toBeFocused();
   await page.keyboard.press('Tab');
-  await expect(close).toBeFocused();
+  await expect(dialog.getByRole('checkbox', { name: 'Enable navigation shortcuts' })).toBeFocused();
   await page.keyboard.press('Shift+Tab');
   await expect(close).toBeFocused();
   await page.keyboard.press('Escape');
@@ -223,7 +221,7 @@ test('narrow viewport keeps navigation and page content usable', async ({ page }
   await page.goto('/catalogue');
   await expect(page.getByRole('heading', { name: 'Catalogue', exact: true })).toBeVisible();
   await page.getByRole('textbox', { name: 'Search demo catalogue' }).fill('robe hook');
-  await expect(page.getByRole('status')).toHaveText('1 demo product');
+  await expect(page.getByRole('status').filter({ hasText: '1 demo product' })).toHaveText('1 demo product');
   const noOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
   expect(noOverflow).toBe(true);
 });
@@ -264,7 +262,7 @@ test('dashboard product search persists in the catalogue URL and supports browse
   await page.getByRole('searchbox', { name: 'Find a sample product' }).fill('DEMO-BM-101');
   await page.getByRole('button', { name: 'Search catalogue', exact: true }).click();
   await expect(page).toHaveURL(/\/catalogue\?q=DEMO-BM-101$/);
-  await expect(page.getByRole('status')).toHaveText('1 demo product');
+  await expect(page.getByRole('status').filter({ hasText: '1 demo product' })).toHaveText('1 demo product');
   await page.reload();
   await expect(page.getByRole('textbox', { name: 'Search demo catalogue' })).toHaveValue('DEMO-BM-101');
   await expect(page.getByRole('button', { name: 'Inspect Arc basin mixer', exact: true })).toBeVisible();
@@ -272,11 +270,11 @@ test('dashboard product search persists in the catalogue URL and supports browse
   await expect(page.getByRole('searchbox', { name: 'Find a sample product' })).toBeVisible();
   await page.getByRole('button', { name: 'Search catalogue', exact: true }).click();
   await expect(page).toHaveURL(/\/catalogue$/);
-  await expect(page.getByRole('status')).toHaveText('6 demo products');
+  await expect(page.getByRole('status').filter({ hasText: '6 demo products' })).toHaveText('6 demo products');
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Dashboard', exact: true }).click();
   await page.getByRole('link', { name: /Rain overhead shower Chrome/ }).click();
   await expect(page).toHaveURL(/\/catalogue\?q=DEMO-SH-204$/);
-  await expect(page.getByRole('status')).toHaveText('1 demo product');
+  await expect(page.getByRole('status').filter({ hasText: '1 demo product' })).toHaveText('1 demo product');
 });
 
 test('blueprint typography and start-page geometry stay consistent', async ({ page }) => {

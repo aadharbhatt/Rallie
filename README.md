@@ -14,7 +14,7 @@ See [docs/LOCAL-RUNTIME.md](docs/LOCAL-RUNTIME.md) for prerequisites, independen
 
 ### Native alternative
 
-Use Node **22.12+** and npm with the committed [package-lock.json](package-lock.json). Install with `npm ci` at the repository root.
+Use Node **22.13+** and npm with the committed [package-lock.json](package-lock.json). Install with `npm ci` at the repository root.
 
 1. `npm run build` builds the web app, dry-runs the Worker bundle without deployment, and audits the browser output.
 2. `npm run db:migrate -- --env dev` applies the foundation migration to local D1 and reports migration versions.
@@ -25,6 +25,8 @@ Executable scripts use explicit Node entrypoints: the workspace path contains a 
 
 ## Verification
 
+- **Full CI-equivalent local gate:** `npm run verify:foundation`, or **Terminal → Run Task… → Rallie: Foundation — Full local gate (CI equivalent)**. Requires Docker/Compose and installed Chromium. Reinstalls from the lockfile, runs lint/scan/types/tests/migrations/build and both 30-test browser targets inside isolated test Docker, then binding persistence/failure checks. Dev state is preserved. See [docs/FOUNDATION-GATE.md](docs/FOUNDATION-GATE.md) for artifacts, prerequisites, manual steps and the still-pending hosted CI acceptance.
+- `npm run lint` and `npm run check:secrets`: TypeScript/React/script lint and redacted source signature checks. Passing scans are not comprehensive proof of credential absence.
 - `npm run typecheck`: checks architectural imports, then separately checks web, Worker, domain, API contracts, SQL package, and tooling.
 - `npm test`: unit/contract tests, including deliberately forbidden browser imports and production migration guards.
 - `npm run test:migrations`: isolated **real local D1/R2 emulator** replay, repeat application, version ledger, bootstrap upgrade, offline restore and four-environment binding isolation (remote-name fixtures remain local-only). Temporary test state is removed afterward.

@@ -9,9 +9,10 @@ export function runtimePlan(args) {
   const [action, flag, environment, ...extra] = args;
   if (!['up', 'down', 'smoke', 'reset', 'verify'].includes(action) || flag !== '--env' || !['dev', 'test'].includes(environment)) throw new Error('Use up|down|smoke|reset|verify --env dev|test. Production and implicit environments are forbidden.');
   if (action === 'reset' && (environment !== 'test' || extra.join(' ') !== '--confirm DELETE_LOCAL_TEST')) throw new Error('Reset is test-only and requires --confirm DELETE_LOCAL_TEST. Dev/production state is never removed.');
-  if (action !== 'reset' && extra.length) throw new Error('Unknown local runtime options.');
+  const browser = action === 'verify' && extra.length === 1 && extra[0] === '--browser';
+  if (action !== 'reset' && extra.length && !browser) throw new Error('Unknown local runtime options.');
   if (action === 'verify' && environment !== 'test') throw new Error('Runtime verification is isolated to its own test project.');
-  return { action, environment, project: action === 'verify' ? 'rallie-verify-test' : `rallie-local-${environment}`, apiPort: environment === 'dev' ? '8788' : '8789', webPort: environment === 'dev' ? '5174' : '5175' };
+  return { action, environment, browser, project: action === 'verify' ? 'rallie-verify-test' : `rallie-local-${environment}`, apiPort: environment === 'dev' ? '8788' : '8789', webPort: environment === 'dev' ? '5174' : '5175' };
 }
 
 export async function localRuntime(args) {
@@ -65,11 +66,21 @@ export async function localRuntime(args) {
   if (plan.action === 'smoke') { await smoke(); return; }
   if (plan.action === 'reset') { compose('down', '--volumes'); console.log('Only the fixed local test project volume was removed. Next up reapplies migrations.'); return; }
   flags.RALLIE_MOCK_EXTRACTION = 'false'; flags.RALLIE_MOCK_TALLY = 'false';
+  const runBrowser = (name, baseURL) => {
+    const result = spawnSync(process.execPath, [resolve(root, 'node_modules/@playwright/test/cli.js'), 'test', '--config', resolve(root, 'tests/playwright.config.ts')], {
+      cwd: root, stdio: 'inherit', env: { ...process.env, CI: 'true', PLAYWRIGHT_BASE_URL: baseURL, RALLIE_BROWSER_GATE: name },
+    });
+    if (result.error || result.status !== 0) throw new Error(`Chromium ${name} foundation gate failed.`);
+  };
   try {
     compose('down', '--volumes'); up(true);
     const health = (await get('/health')).body;
     assert.deepEqual(health.runtime, { environment: 'test', extraction: 'unavailable', tally: 'unavailable' });
     for (const name of ['documents', 'assets', 'ingestionWorkflow', 'tallyConnections']) assert.equal(health.bindings[name], 'configured');
+    if (plan.browser) {
+      runBrowser('worker', api);
+      runBrowser('web', `http://127.0.0.1:${plan.webPort}`);
+    }
     const empty = (await get('/api/__local/smoke')).body;
     for (const name of ['database', 'documents', 'durableObject']) assert.equal(empty[name], false);
     const workflowId = await smoke();

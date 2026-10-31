@@ -6,6 +6,12 @@ const tasks = JSON.parse(readFileSync(new URL('../.vscode/tasks.json', import.me
 const launch = JSON.parse(readFileSync(new URL('../.vscode/launch.json', import.meta.url), 'utf8'));
 
 describe('VS Code Docker run entries', () => {
+  it('exposes the full gate in Terminal Run Task without changing the Docker build default', () => {
+    expect(tasks.tasks.find((task) => task.label === 'Rallie: Foundation — Full local gate (CI equivalent)')).toMatchObject({
+      type: 'process', command: 'node', args: ['${workspaceFolder}/scripts/foundation-gate.mjs'], group: 'test',
+    });
+    expect(tasks.tasks.find((task) => task.group?.isDefault)?.label).toBe('Rallie: Docker — Start / rebuild');
+  });
   it('pins shell-free tasks to this workspace and the fixed local project', () => {
     expect(tasks.options.cwd).toBe('${workspaceFolder}');
     expect(tasks.options.env).toEqual({ RALLIE_MOCK_EXTRACTION: 'false', RALLIE_MOCK_TALLY: 'false' });
@@ -16,7 +22,8 @@ describe('VS Code Docker run entries', () => {
         expect(task.args).toContain('rallie-local-dev');
         expect(task.args).not.toContain('--volumes');
       } else {
-        expect(task.args[0]).toBe('${workspaceFolder}/scripts/local-runtime.mjs');
+        expect(task.args[0]).toBe(task.label === 'Rallie: Foundation — Full local gate (CI equivalent)'
+          ? '${workspaceFolder}/scripts/foundation-gate.mjs' : '${workspaceFolder}/scripts/local-runtime.mjs');
       }
     }
   });

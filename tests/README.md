@@ -1,5 +1,11 @@
 # Foundation test boundaries
 
+## Current RAL-005 local gate
+
+Run `npm run verify:foundation` or **Terminal → Run Task… → Rallie: Foundation — Full local gate (CI equivalent)** after installing Chromium and starting Docker. It runs lockfile install, lint/source secret checks, typechecks, Vitest, real D1 replay/recovery/isolation, build/audits, then all **30 Chromium cases against both built Worker and Vite** in disposable test Docker (60 browser executions) plus all four binding restart/failure checks. [Gate evidence and remaining hosted CI acceptance](../docs/FOUNDATION-GATE.md) distinguish local success from an unexecuted GitHub Actions run. No cloud/AI/Tally live test is implied.
+
+Root browser reports and JUnit/trace directories are separated by worker/web target. The shell's module fault patterns now cover hashed built chunks **and** Vite source modules; the earlier RAL-003 built-only restriction below is historical. Node 22.13+ is now required by lint tooling. Existing totals below describe earlier deliveries, not the current gate.
+
 ## RAL-003 shell/health acceptance
 
 The current full suite has **27 tests**. Rebuild with the **Rallie: Docker — Start / rebuild** VS Code task, then use `PLAYWRIGHT_BASE_URL=http://127.0.0.1:8788 npm run test:e2e -- --workers=2`. This targets the real local Worker serving production assets, D1 and SPA routing. The new [shell suite](e2e/shell.spec.ts) deliberately blocks built hashed chunks, injects a render failure, delays modules/health, checks Save-Data, mobile focus/resize, input/IME-safe shortcuts and bounded recovery. Those chunk/network assertions must not target Vite at 5174. [Evidence, limitations and manual validation](../docs/SHELL-HEALTH.md) include 100 unit/contract tests, 27 browser tests, 12 repeated focus/recovery checks, migration integration and actual isolated runtime verification. Health/clock/error interceptions are controlled fixtures; normal API/health/deep-link assertions use the real local Worker. The historical RAL-002 totals below describe that earlier delivery, not the current suite.

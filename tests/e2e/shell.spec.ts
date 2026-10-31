@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { healthSchema, livenessSchema, apiErrorSchema } from '../../packages/api-contracts/src/index';
 
+// Match the actual lazy module in both built assets and Vite source mode.
+const featureModule = (feature: string) => new RegExp(`/(?:assets/${feature}-[^/]+\\.js|src/features/${feature}\\.tsx)(?:\\?.*)?$`);
+
 test('Worker deep links and API routes keep their distinct HTML/JSON contracts', async ({ request, page }) => {
   for (const path of ['/catalogue?q=079n', '/settings', '/not-a-page']) {
     const response = await request.get(path, { headers: { Accept: 'text/html' } });
@@ -81,14 +84,14 @@ test('slow cold bootstrap has bounded keyboard recovery, never a warm-route spla
 test('Save-Data boot loads only the current feature and loading keeps navigation usable', async ({ page }) => {
   await page.addInitScript(() => Object.defineProperty(navigator, 'connection', { value: { saveData: true } }));
   const modules: string[] = [];
-  page.on('request', (request) => { if (/\/assets\/.*\.js/.test(request.url())) modules.push(request.url()); });
+  page.on('request', (request) => { if (/\/assets\/.*\.js|\/src\/features\/.*\.tsx/.test(request.url())) modules.push(request.url()); });
   await page.goto('/settings');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Settings');
   await page.getByRole('link', { name: 'Quotations', exact: true }).focus();
-  expect(modules.some((url) => /\/(catalogue|quotations|tally|dashboard)-/.test(url))).toBe(false);
+  expect(modules.some((url) => /\/(catalogue|quotations|tally|dashboard)(?:-|\.tsx)/.test(url))).toBe(false);
   let release: () => void = () => {};
   const gate = new Promise<void>((resolve) => { release = resolve; });
-  await page.route('**/assets/catalogue-*.js', async (route) => { await gate; await route.continue(); });
+  await page.route(featureModule('catalogue'), async (route) => { await gate; await route.continue(); });
   await page.getByRole('link', { name: 'Catalogue', exact: true }).click();
   await expect(page.getByRole('status', { name: 'Loading page' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible();
@@ -101,12 +104,12 @@ test('failed page chunk stays inside the shell and explicit retry recovers witho
   await page.goto('/settings');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Settings');
   await page.evaluate(() => { (globalThis as typeof globalThis & { shellSentinel: string }).shellSentinel = 'retained'; });
-  await page.route('**/assets/tally-*.js', (route) => route.abort());
+  await page.route(featureModule('tally'), (route) => route.abort());
   await page.getByRole('link', { name: 'Tally', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'This page couldn’t load.' })).toBeFocused();
   await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible();
   await expect(page).toHaveURL(/\/tally$/);
-  await page.unroute('**/assets/tally-*.js');
+  await page.unroute(featureModule('tally'));
   await page.getByRole('button', { name: 'Retry page' }).focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Tally');
@@ -141,7 +144,7 @@ test('shortcuts respect edit/composition and opt-out while ordinary navigation r
 test('a page render exception is sanitized and cannot discard the shell', async ({ page }) => {
   await page.addInitScript(() => Object.defineProperty(navigator, 'connection', { value: { saveData: true } }));
   await page.goto('/settings');
-  await page.route('**/assets/tally-*.js', (route) => route.fulfill({ contentType: 'text/javascript', body: 'export function Component() { throw new Error("PRIVATE_RENDER_CANARY"); }' }));
+  await page.route(featureModule('tally'), (route) => route.fulfill({ contentType: 'text/javascript', body: 'export function Component() { throw new Error("PRIVATE_RENDER_CANARY"); }' }));
   await page.getByRole('link', { name: 'Tally', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'This page couldn’t load.' })).toBeVisible();
   await expect(page.locator('body')).not.toContainText('PRIVATE_RENDER_CANARY');
@@ -154,12 +157,12 @@ test('a late module response cannot replace the newly selected route', async ({ 
   await page.goto('/settings');
   let release: () => void = () => {};
   const gate = new Promise<void>((resolve) => { release = resolve; });
-  await page.route('**/assets/tally-*.js', async (route) => { await gate; await route.continue(); });
+  await page.route(featureModule('tally'), async (route) => { await gate; await route.continue(); });
   await page.getByRole('link', { name: 'Tally', exact: true }).click();
   await expect(page.getByRole('status', { name: 'Loading page' })).toBeVisible();
   await page.getByRole('link', { name: 'Catalogue', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Catalogue');
-  const response = page.waitForResponse('**/assets/tally-*.js');
+  const response = page.waitForResponse(featureModule('tally'));
   release();
   await response;
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Catalogue');

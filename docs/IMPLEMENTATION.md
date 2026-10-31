@@ -82,7 +82,7 @@ Every row's owner is **agent/unassigned** until explicitly assigned. Parent deta
 | RAL-002 | Foundation: Docker local Cloudflare runtime | DONE | GitHub Copilot |
 | RAL-003 | Foundation: shell and health | DONE | GitHub Copilot |
 | RAL-004 | Foundation: environment and migration isolation | DONE | GitHub Copilot |
-| RAL-005 | Foundation: automated checks and local gate | TODO | agent/unassigned |
+| RAL-005 | Foundation: automated checks and local gate | IN_PROGRESS | GitHub Copilot |
 | RAL-006 | Foundation: credential-gated deployment | TODO | agent/unassigned |
 | RAL-007 | Identity: library-backed authentication | TODO | agent/unassigned |
 | RAL-008 | Identity: business membership authorization | TODO | agent/unassigned |
@@ -245,13 +245,13 @@ These are proposed implementation decisions, not unstated requirements from the 
 - **Evidence / notes:** [Environment matrix, migration/recovery runbook, executed evidence and manual validation](ENVIRONMENTS.md); mapped children FND-008/FND-010 verified. 133 unit/contract tests, all package/tool typechecks, 2 real local D1/R2 integration tests (empty/repeat/bootstrap upgrade/ledger/sentinel restore and four-way isolated binding identities), 30 Docker built-asset Chromium tests, web build + Worker dry-run/audits and isolated four-binding Docker restart/reset/failure checks passed. Staging/production binding fixtures were synthetic and remote:false; setup checks honestly returned unprovisioned/no deployment. Exact origin/CORS policies, remote missing bindings/mock denial, claimed state roots and test-only verified recovery points enforced. No new migration, domain schema, dependency, live credential/resource ID or deployment. Actual remote config wiring, provisioning, protected deploy/live migrations/cloud recovery remain RAL-006; CI remains RAL-005. Existing build warnings, operator-attested offline recovery, no independent review/new commit and untested live integrations remain explicit limitations.
 
 ### RAL-005 — Establish CI checks and the runnable local foundation gate
-- **Status:** TODO; **Owner:** agent/unassigned; **Dependencies:** RAL-003, RAL-004.
+- **Status:** IN_PROGRESS; **Owner:** GitHub Copilot; **Dependencies:** RAL-003, RAL-004. Started/local verification 2026-10-31; uncommitted working tree based on 92b629c, no new commit/PR; scope FND-011–012 only; hosted clean-checkout CI evidence pending, no deployment or identity/domain implementation.
 - **Scope:** Lockfile-backed install, lint/typecheck, Vitest, production build, D1 migration replay and Playwright shell/health smoke in CI. Container reproducibility is tested separately from Cloudflare deployment.
 - **UI / keyboard:** Playwright asserts shell focus/navigation, error boundary and loading state, not just screenshot existence.
 - **API / security:** Contract tests exercise health/error routes; secret scanning and safe fixture credentials. Untrusted PRs receive no deployment secrets.
 - **DB / migrations:** CI starts isolated empty local D1 and applies only migrations currently owned by delivered slices.
-- **Acceptance:** [ ] Clean-checkout automated checks pass. [ ] Docker local web/API and all four emulated bindings are exercised. [ ] CI clearly reports tests versus skipped live integrations. [ ] No foundation ticket is marked DONE merely because files exist.
-- **Evidence / notes:** _Pending: CI run, commands/results, browser trace._
+- **Acceptance:** [ ] Clean-checkout hosted CI automated checks pass (local clean Linux source-image checks passed; hosted run still required). [x] Docker local web/API and all four emulated bindings are exercised. [x] CI configuration/local summary explicitly separate tested local behavior from skipped live integrations (hosted rendering pending). [x] No foundation ticket is marked DONE merely because files exist.
+- **Evidence / notes:** [Gate implementation, executed evidence, artifacts and manual validation](FOUNDATION-GATE.md). Complete lockfile-backed local gate passed lint/redacted scan/boundaries/types, 139 unit/negative contracts at that run (140 after task discoverability assertion), 2 real storage integrations, production-entry build/dry-run/audits, 30 Worker + 30 Vite Chromium cases with traces, and Docker four-binding persistence/failure/reset verification. Fresh nonroot Node 22 Linux image core checks passed without host state mounts; action commit pins resolved via read-only API; dependency audit zero advisories after patched minimatch override. FND-012 local gate DONE; FND-011 remains IN_PROGRESS until owner-approved commit/push and actual clean-checkout hosted Actions run URL/results are recorded. No remote deployment, live AI/Tally, future domain migration or clean Git commit claimed. Existing bundle warnings and manual assistive-technology/release gates remain. RAL-006 unchanged.
 
 ### RAL-006 — Gate main-branch deployment on provisioning and credentials
 - **Status:** TODO; **Owner:** agent/unassigned; **Dependencies:** RAL-004, RAL-005.

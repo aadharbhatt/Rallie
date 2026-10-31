@@ -1,0 +1,63 @@
+name: Foundation checks (no deployment)
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: foundation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  foundation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CI: 'true'
+      WRANGLER_SEND_METRICS: 'false'
+      CLOUDFLARE_CF_FETCH_ENABLED: 'false'
+      CLOUDFLARE_INCLUDE_PROCESS_ENV: 'false'
+      RALLIE_MOCK_EXTRACTION: 'false'
+      RALLIE_MOCK_TALLY: 'false'
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22.23.4'
+          cache: npm
+      - name: Lockfile install for browser installer
+        run: npm ci --no-audit --no-fund
+      - name: Install Chromium and Linux dependencies
+        run: node node_modules/@playwright/test/cli.js install --with-deps chromium
+      - name: Verify the complete local foundation
+        run: npm run verify:foundation
+      - name: Publish test-only artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: foundation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            .local/foundation-gate/summary.json
+            test-results/
+            playwright-report/
+          if-no-files-found: warn
+          include-hidden-files: true
+          retention-days: 7
+      - name: State the live-integration boundary
+        if: always()
+        run: |
+          if test -f .local/foundation-gate/summary.json; then
+            node --input-type=module -e 'import { readFileSync, appendFileSync } from "node:fs"; const s = JSON.parse(readFileSync(".local/foundation-gate/summary.json", "utf8")); appendFileSync(process.env.GITHUB_STEP_SUMMARY, `Local gate: **${s.status}**. Completed checks: ${s.checks.length}.\n\n`);'
+          else
+            printf '%s\n' 'Local gate: **not completed** (setup failed or the job was cancelled before a summary was written).' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          printf '%s\n' '## Foundation gate' 'Inspect the check exit status and uploaded summary/browser artifacts.' '### SKIPPED — not live integration success' '- Cloudflare provisioning/deployment and cloud recovery: RAL-006.' '- Real Workers AI extraction: later ingestion gate.' '- Windows/Tally and accounting effects: later Tally gate.' 'No deployment secrets, protected environment or deploy command are used.' >> "$GITHUB_STEP_SUMMARY"

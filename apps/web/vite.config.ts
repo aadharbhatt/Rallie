@@ -10,6 +10,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
+    // Let the Worker own API CORS; Vite's default must not add allow-origin to denied responses.
+    cors: false,
     port: 5173,
     strictPort: true,
     fs: { strict: false, allow: [resolve(configDir, '../..')] },

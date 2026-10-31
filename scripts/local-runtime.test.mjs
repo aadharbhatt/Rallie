@@ -9,6 +9,10 @@ describe('local runtime command guard', () => {
     expect(runtimePlan(['verify', '--env', 'test']).project).toBe('rallie-verify-test');
     expect(runtimePlan(['reset', '--env', 'test', '--confirm', 'DELETE_LOCAL_TEST']).project).toBe('rallie-local-test');
   });
+  it('allows browser checks only inside disposable test verification', () => {
+    expect(runtimePlan(['verify', '--env', 'test', '--browser'])).toMatchObject({ browser: true, project: 'rallie-verify-test' });
+    for (const args of [['up', '--env', 'dev', '--browser'], ['verify', '--env', 'test', '--browser', '--remote'], ['verify', '--env', 'dev', '--browser']]) expect(() => runtimePlan(args)).toThrow();
+  });
   it('requires explicit local startup and rejects secrets/invalid flags', () => {
     const args = ['--env', 'dev', '--ip', '127.0.0.1'];
     expect(localOptions(args, {})).toMatchObject({ environment: 'dev', extraction: 'false', tally: 'false' });

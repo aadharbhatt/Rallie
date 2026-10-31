@@ -132,26 +132,26 @@ Each ticket is intended as one independently verifiable increment, normally no m
 ## Support area: local gate and credential-gated deployment (not a screen)
 
 ### FND-011 — Run deterministic checks in untrusted CI
-- **Status:** TODO
-- **Owner:** unassigned
+- **Status:** IN_PROGRESS (started 2026-10-31; scope RAL-005 only)
+- **Owner:** GitHub Copilot
 - **Parents:** RAL-005 ([requirement](../IMPLEMENTATION.md)).
 - **Depends on:** FND-003, FND-009.
 - **UI checklist:** None; browser interaction checks are separated into FND-012.
 - **API/backend checklist:** [ ] Lockfile install, lint, typecheck, Vitest, production build and secret scan run on clean checkout; forks receive no deployment secrets; live integrations report skipped, not passed.
 - **DB checklist:** [ ] CI provisions isolated local D1 and replays only the currently owned slice migrations.
 - **Verify:** 1. Clean-checkout CI passes with recorded outputs. 2. Introduce a contract mismatch and a fake secret fixture: their respective checks fail without printing real secrets.
-- **Evidence:** pending.
+- **Evidence:** [Implementation, local verification and remaining hosted acceptance](../FOUNDATION-GATE.md). Workflow, frozen install, lint/signature/type/unit/migration/build checks, least-privilege pinned PR actions, always-uploaded test reports and explicit live skips implemented. Local full gate passed (139 unit tests at that point, 2 real storage integrations, 30 built-Worker + 30 Vite browser cases); follow-up task assertion raises inventory to 140. Fresh source-only nonroot Node 22 Linux image passed core checks without host state mounts. Actual TS2322 contract mismatch and constructed fake-token redacted failure verified; minimatch patched override audited at zero advisories. **Not DONE:** clean-checkout hosted Actions run is not executed because workflow/source remain uncommitted/unpushed. Next action: repository owner reviews/commits/pushes approved branch, records run URL/commit/artifacts/results, then closes this ticket if passed. No credential prerequisite; live deployment remains RAL-006.
 
 ### FND-012 — Record the runnable local foundation gate
-- **Status:** TODO
-- **Owner:** unassigned
+- **Status:** DONE (started/verified 2026-10-31; uncommitted working tree based on 92b629c, no new commit/PR; local scope only)
+- **Owner:** GitHub Copilot
 - **Parents:** RAL-003, RAL-005 ([requirements](../IMPLEMENTATION.md)).
 - **Depends on:** FND-005, FND-006, FND-010, FND-011; shell browser acceptance supplied under RAL-003, not a circular completed-parent prerequisite.
-- **UI checklist:** [ ] Playwright asserts loading/error boundary, skip link, focus, responsive navigation and honest placeholders; manually inspect keyboard route flow.
-- **API/backend checklist:** [ ] Test SPA deep links separately from `/api/*` failures: API errors must never be HTML; collect all four emulator binding results.
-- **DB checklist:** [ ] Include isolated foundation replay and persistence assertions, not future schema.
+- **UI checklist:** [x] Playwright asserts loading/error boundary, skip link, focus, responsive navigation and honest placeholders; manually inspect keyboard route flow.
+- **API/backend checklist:** [x] Test SPA deep links separately from `/api/*` failures: API errors must never be HTML; collect all four emulator binding results.
+- **DB checklist:** [x] Include isolated foundation replay and persistence assertions, not future schema.
 - **Verify:** 1. Clean container startup plus browser suite pass. 2. Fault API/chunk loading: retry and focus remain usable; report unavailable live integrations separately.
-- **Evidence:** pending.
+- **Evidence:** [Runnable gate, artifact contract and manual checks](../FOUNDATION-GATE.md). Full process task passed lockfile-through-browser/binding gate; 30 built-Worker and 30 Vite cases passed with traces/JUnit/HTML. Actual Docker D1/R2/Workflow/DO startup/restart/outage/mock/removed-binding/reset paths passed and disposable volume cleaned without stopping dev. D1 replay/repeat/upgrade/sentinel restore and storage isolation passed. Fixed Vite-added CORS headers on Worker denials and module-fault patterns so neither browser target bypasses error cases. Fresh built-Worker Settings keyboard skip → main and Catalogue Enter → main manually inspected. No new migration/domain feature; intercepted health/chunk/render tests are labeled fixtures, real bindings separately exercised. FND-011 hosted CI evidence remains pending independently of this local gate acceptance; no deployment/real AI/Windows claim. UI authorization/tenant business mutation N/A for support slice; future auth/security gates remain required.
 
 ### FND-013 — Block deployment until trusted provisioning exists
 - **Status:** TODO
@@ -177,9 +177,9 @@ Each ticket is intended as one independently verifiable increment, normally no m
 
 ## Support-area completion checklist
 
-- [ ] Typed bootstrap: FND-001–FND-003 verified; no premature domain schema or browser secrets.
-- [ ] Local runtime: FND-004–FND-007 verified against all four emulated bindings, with limitations stated.
-- [ ] Environment/health: FND-008–FND-010 verified, including failure and migration recovery paths.
+- [x] Typed bootstrap: FND-001–FND-003 verified; no premature domain schema or browser secrets.
+- [x] Local runtime: FND-004–FND-007 verified against all four emulated bindings, with limitations stated.
+- [x] Environment/health: FND-008–FND-010 verified, including failure and migration recovery paths.
 - [ ] Local gate: FND-011–FND-012 plus visible shell acceptance under RAL-003 accepted; no production claim inferred.
 - [ ] Deployment: FND-013–FND-014 separately evidenced or explicitly blocked; no skipped deployment counted as live success.
 

@@ -3,6 +3,8 @@ import type { D1Database, DurableObjectNamespace, Fetcher, R2Bucket, Workflow } 
 /** Optional at the boundary so missing local bindings are reported honestly. */
 export interface Env {
   RUNTIME_ENV?: string;
+  APP_ORIGIN?: string;
+  ALLOWED_ORIGINS?: string;
   MOCK_EXTRACTION?: string;
   MOCK_TALLY?: string;
   DB?: D1Database;

@@ -1,0 +1,16 @@
+{
+  "staging": {
+    "mode": "remote",
+    "origins": [],
+    "databaseName": "rallie-staging",
+    "databaseId": null,
+    "bucketName": null
+  },
+  "production": {
+    "mode": "remote",
+    "origins": [],
+    "databaseName": "rallie-production",
+    "databaseId": null,
+    "bucketName": null
+  }
+}

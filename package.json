@@ -21,7 +21,9 @@
     "local:reset:test": "node scripts/local-runtime.mjs reset --env test",
     "test:runtime": "node scripts/local-runtime.mjs verify --env test",
     "db:migrate": "node scripts/migrate.mjs apply",
-    "db:status": "node scripts/migrate.mjs status"
+    "db:status": "node scripts/migrate.mjs status",
+    "env:check": "node scripts/environments.mjs",
+    "db:recovery": "node scripts/recovery.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.1",

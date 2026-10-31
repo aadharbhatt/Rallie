@@ -15,7 +15,8 @@ export async function localSmoke(request: Request, env: Env): Promise<Response> 
   if (!['dev', 'test'].includes(runtime.environment)) return error('not_found', 'This route is not available.', 404);
   const url = new URL(request.url);
   const origin = request.headers.get('Origin');
-  if (!hosts.has(url.hostname) || (origin && origin !== url.origin && !origins.has(origin))) return error('forbidden', 'Local diagnostics reject this origin.', 403);
+  const allowed = env.ALLOWED_ORIGINS ? new Set(env.ALLOWED_ORIGINS.split(',')) : origins;
+  if (!hosts.has(url.hostname) || (origin && (env.ALLOWED_ORIGINS ? !allowed.has(origin) : origin !== url.origin && !allowed.has(origin)))) return error('forbidden', 'Local diagnostics reject this origin.', 403);
   if (!env.DB || !env.DOCUMENTS || !env.INGESTION_WORKFLOW || !env.TALLY_CONNECTIONS) return error('binding_unavailable', 'A required local emulator binding is missing. No mock fallback was used.', 503);
   const workflowId = url.pathname.match(/^\/api\/__local\/workflow\/([0-9a-f-]{36})$/)?.[1];
   if (url.pathname !== '/api/__local/smoke' && !workflowId) return error('not_found', 'Unknown local diagnostic route.', 404);

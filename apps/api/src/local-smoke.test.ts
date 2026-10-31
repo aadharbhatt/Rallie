@@ -28,6 +28,11 @@ describe('local-only binding diagnostics guard', () => {
     const response = await localSmoke(new Request('http://[::1]:8787/api/__local/smoke', { headers: { Origin: 'http://[::1]:5174' } }), bindings());
     expect(apiErrorSchema.parse(await response.json()).code).toBe('probe_failed');
   });
+  it('uses the selected environment origin matrix instead of other local environments', async () => {
+    const env = { ...bindings(), ALLOWED_ORIGINS: 'http://127.0.0.1:5175' };
+    expect((await localSmoke(request(undefined, { method: 'POST', headers: { Origin: 'http://127.0.0.1:5174' } }), env)).status).toBe(403);
+    expect(env.DB?.prepare).not.toHaveBeenCalled();
+  });
   it('rejects arbitrary payloads, methods and routes', async () => {
     const env = bindings();
     expect((await localSmoke(request(undefined, { method: 'POST', body: 'private' }), env)).status).toBe(403);

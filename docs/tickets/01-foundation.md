@@ -97,15 +97,15 @@ Each ticket is intended as one independently verifiable increment, normally no m
 ## Support area: environment and health isolation (not a screen)
 
 ### FND-008 — Validate separate environment bindings and origins
-- **Status:** TODO
-- **Owner:** unassigned
+- **Status:** DONE (started/verified 2026-10-31; uncommitted working tree based on c5e6c05, no new commit/PR; scope RAL-004 only)
+- **Owner:** GitHub Copilot
 - **Parents:** RAL-004 ([requirement](../IMPLEMENTATION.md)).
 - **Depends on:** FND-004, FND-007.
-- **UI checklist:** [ ] Specify nonproduction banner and distinct unprovisioned/unhealthy messages for the shell.
-- **API/backend checklist:** [ ] Validate dev/staging/prod binding and origin matrix, narrow CORS, required secrets and production mock prohibition; local defaults cannot use production resources.
-- **DB checklist:** [ ] Reject reuse of database/bucket bindings across environments; store actual resource IDs outside public evidence.
+- **UI checklist:** [x] Specify nonproduction banner and distinct unprovisioned/unhealthy messages for the shell.
+- **API/backend checklist:** [x] Validate dev/staging/prod binding and origin matrix, narrow CORS, required secrets and production mock prohibition; local defaults cannot use production resources.
+- **DB checklist:** [x] Reject reuse of database/bucket bindings across environments; store actual resource IDs outside public evidence.
 - **Verify:** 1. Test a valid matrix and deliberately shared binding: latter fails. 2. Missing secrets return actionable setup status without attempted deployment or secret disclosure.
-- **Evidence:** pending.
+- **Evidence:** [Environment contract, executed checks and manual validation](../ENVIRONMENTS.md). 133 unit/contract tests, typechecks/build/audits, 2 real local D1/R2 integration tests and 30 Docker built-asset Chromium tests passed. Four-way distinct D1/R2 isolation used synthetic local-only staging/production fixtures, not cloud resources. Setup checks reported dev/test configured and remote targets unprovisioned with no deployment; remote missing-binding/mock/origin cases fail closed. Actual dashboard inspected for nonproduction and mock-off labels; setup/unhealthy/staging browser cases explicitly intercepted. Docker four-binding isolated gate passed. No live credentials/resource IDs supplied; private metadata stays ignored and remote configuration/deployment remains RAL-006. No authenticated business mutation/tenant authorization claim; applicability and limits recorded.
 
 ### FND-009 — Serve safe liveness and dependency readiness
 - **Status:** DONE (started 2026-10-30; verified this session; uncommitted working tree based on fb34baf, no new commit/PR)
@@ -119,15 +119,15 @@ Each ticket is intended as one independently verifiable increment, normally no m
 - **Evidence:** [RAL-003 evidence](../SHELL-HEALTH.md): 100 unit/contract tests include missing/failing/stalled binding, same-binding readiness 503 versus liveness 200 and exception sanitization; real Docker Worker health and API JSON verified in 27 passing browser tests. Actual API outage/recovery inspected. Full resource/origin isolation remains FND-008; optional bindings report presence, with real connectivity tested separately by the isolated runtime gate. No new migration.
 
 ### FND-010 — Document forward migration and recovery safeguards
-- **Status:** TODO
-- **Owner:** unassigned
+- **Status:** DONE (started/verified 2026-10-31; uncommitted working tree based on c5e6c05, no new commit/PR; scope RAL-004 only)
+- **Owner:** GitHub Copilot
 - **Parents:** RAL-004 ([requirement](../IMPLEMENTATION.md)).
 - **Depends on:** FND-003, FND-008.
 - **UI checklist:** None; operator recovery is non-screen support.
-- **API/backend checklist:** [ ] Define compatibility ordering, recovery-point prerequisite and operator approval before destructive changes; no generic database abstraction or speculative services.
-- **DB checklist:** [ ] Record empty replay, forward upgrade and backup/restore rehearsal against disposable state; prohibit production test seeds and destructive reset.
+- **API/backend checklist:** [x] Define compatibility ordering, recovery-point prerequisite and operator approval before destructive changes; no generic database abstraction or speculative services.
+- **DB checklist:** [x] Record empty replay, forward upgrade and backup/restore rehearsal against disposable state; prohibit production test seeds and destructive reset.
 - **Verify:** 1. Rehearse forward upgrade and restore on disposable D1: expected versions/data return. 2. Review runbook with an intentionally missing recovery point: destructive step is blocked.
-- **Evidence:** pending.
+- **Evidence:** [Forward migration and offline recovery runbook](../ENVIRONMENTS.md). Real disposable D1 empty/repeat/bootstrap upgrade preserved sentinel and ledger; backup → mutation → restore returned original data, and reapply remained safe. Missing/tampered/cross-target recovery points, absent stopped-runtime approval, symlinks, path escapes, nested state roots and production operations rejected. Same validated remote:false local config now drives startup and migrations. Only existing 0001_foundation.sql; no domain schema or seeds. Recovery is an offline test-only rehearsal, not cloud backup/restore; operator stop is an explicit attestation and displaced state is retained. Remote recovery prerequisites/compatibility ordering documented for RAL-006. UI/keyboard N/A for recovery; no independent sign-off/new commit or production rehearsal claimed.
 
 ## Support area: local gate and credential-gated deployment (not a screen)
 

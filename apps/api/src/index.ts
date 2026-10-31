@@ -3,6 +3,7 @@ import { probeDatabase } from '@rallie/db';
 import type { Env } from './env';
 import { error, json } from './responses';
 import { runtimeStatus } from './runtime';
+import { requestPolicy, withOriginHeaders } from './origins';
 
 export type { Env } from './env';
 
@@ -28,6 +29,16 @@ async function databaseStatus(env: Env): Promise<HealthResponse['database']['sta
 export async function handleRequest(request: Request, env: Env): Promise<Response> {
   const runtime = runtimeStatus(env);
   if (!runtime) return error('invalid_configuration', 'Mock services require an explicit dev/test environment and boolean flags.', 503);
+  const pathname = new URL(request.url).pathname;
+  if (pathname.startsWith('/api/__local')) return error('not_found', 'This route is not available.', 404);
+  if (['/health', '/health/live'].includes(pathname) && request.method !== 'GET' && request.method !== 'OPTIONS') return error('method_not_allowed', 'Use GET for health checks.', 405, { Allow: 'GET' });
+  const denied = requestPolicy(request, env);
+  if (denied) return denied;
+  return withOriginHeaders(await routeRequest(request, env), request, env);
+}
+
+async function routeRequest(request: Request, env: Env): Promise<Response> {
+  const runtime = runtimeStatus(env)!;
   const url = new URL(request.url);
   if (url.pathname.startsWith('/api/__local')) return error('not_found', 'This route is not available.', 404);
   if (url.pathname === '/health/live') {

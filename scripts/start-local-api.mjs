@@ -3,6 +3,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runMigrations } from './migrate.mjs';
+import { loadMatrix, setupStatus } from './environments.mjs';
 
 export const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -21,11 +22,13 @@ export function localOptions(args, environment = process.env) {
 
 export function startLocalApi(args) {
   const options = localOptions(args);
+  const matrix = loadMatrix();
+  if (setupStatus(matrix, options.environment).status !== 'configured') throw new Error('Local environment matrix is invalid. Run env:check; no runtime started.');
   const config = JSON.parse(readFileSync(resolve(root, 'wrangler.local.json'), 'utf8'));
   config.main = resolve(root, config.main);
   config.assets.directory = resolve(root, config.assets.directory);
   for (const [name, env] of Object.entries(config.env)) {
-    env.vars = { RUNTIME_ENV: name, MOCK_EXTRACTION: options.extraction, MOCK_TALLY: options.tally };
+    env.vars = { RUNTIME_ENV: name, ALLOWED_ORIGINS: matrix[name].origins.join(','), MOCK_EXTRACTION: options.extraction, MOCK_TALLY: options.tally };
     for (const database of env.d1_databases) database.migrations_dir = resolve(root, database.migrations_dir);
     if (options.omit === 'INGESTION_WORKFLOW') env.workflows = [];
     if (options.omit === 'TALLY_CONNECTIONS') env.durable_objects.bindings = [];

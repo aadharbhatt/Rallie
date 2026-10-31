@@ -1,6 +1,8 @@
 import { spawnSync } from 'node:child_process';
-import { dirname, isAbsolute, relative, resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { claimState, statePath } from './local-state.mjs';
+import { loadMatrix, setupStatus } from './environments.mjs';
 
 export const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -16,10 +18,10 @@ export function migrationPlan(args) {
   }
   const environment = values['--env'];
   if (!['dev', 'test'].includes(environment)) throw new Error('Explicit --env dev|test is required. Staging/production are not provisioned; refusing any write.');
-  const persistence = resolve(root, values['--persist-to'] ?? `.local/state/${environment}`);
-  const localPath = relative(resolve(root, '.local'), persistence);
-  if (!localPath || localPath.startsWith('..') || isAbsolute(localPath)) throw new Error('Persistence must be a directory inside .local/; refusing an unsafe target.');
-  const base = ['--config', resolve(root, 'wrangler.jsonc'), '--env', environment];
+  const persistence = statePath(environment, values['--persist-to']);
+  if (setupStatus(loadMatrix(), environment).status !== 'configured') throw new Error('Environment matrix invalid; no migration attempted. Run env:check.');
+  // Use the same validated, explicit remote:false bindings as local API startup.
+  const base = ['--config', resolve(root, 'wrangler.local.json'), '--env', environment];
   const environmentFile = `--env-file=${resolve(root, 'config/local-vars.txt')}`;
   const command = (operation) => [...base, 'd1', 'migrations', operation, 'DB', '--local', '--persist-to', persistence, environmentFile];
   const versions = [...base, 'd1', 'execute', 'DB', '--local', '--persist-to', persistence, '--command', 'SELECT name, applied_at FROM d1_migrations ORDER BY id', environmentFile];
@@ -28,6 +30,7 @@ export function migrationPlan(args) {
 
 export function runMigrations(args, execute = spawnSync) {
   const plan = migrationPlan(args);
+  claimState(plan.environment, plan.persistence);
   console.log(`D1 migrations: ${plan.environment}, local emulator only. Pending-version report follows.`);
   for (const args of plan.commands) {
     const result = execute(process.execPath, [resolve(root, 'node_modules/wrangler/bin/wrangler.js'), ...args], {

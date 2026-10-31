@@ -1,0 +1,30 @@
+{
+  "dev": {
+    "mode": "local",
+    "origins": ["http://127.0.0.1:8788", "http://127.0.0.1:5174", "http://127.0.0.1:8787", "http://127.0.0.1:5173", "http://localhost:5173"],
+    "databaseName": "rallie-dev",
+    "databaseId": "00000000-0000-0000-0000-000000000001",
+    "bucketName": "rallie-local-dev-documents"
+  },
+  "test": {
+    "mode": "local",
+    "origins": ["http://127.0.0.1:8789", "http://127.0.0.1:5175", "http://127.0.0.1:8787"],
+    "databaseName": "rallie-test",
+    "databaseId": "00000000-0000-0000-0000-000000000002",
+    "bucketName": "rallie-local-test-documents"
+  },
+  "staging": {
+    "mode": "remote",
+    "origins": [],
+    "databaseName": "rallie-staging",
+    "databaseId": null,
+    "bucketName": null
+  },
+  "production": {
+    "mode": "remote",
+    "origins": [],
+    "databaseName": "rallie-production",
+    "databaseId": null,
+    "bucketName": null
+  }
+}

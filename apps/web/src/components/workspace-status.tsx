@@ -20,7 +20,7 @@ export function WorkspaceStatus() {
   }, [health.state]);
   if (health.state === 'loaded') return <RuntimeNotice runtime={health.data.runtime} database={health.data.database.status} />;
   if (health.state === 'error') return <div className="workspace-status" role="status" aria-label="Workspace connection">
-    <strong>API unavailable</strong><span>Environment and dependency readiness are unknown. Preview only; authentication is not implemented.</span>
+    <strong>{health.message.startsWith('Environment setup incomplete') ? 'Environment unprovisioned' : 'API unavailable'}</strong><span>{health.message} Preview only; authentication is not implemented.</span>
     <button className="text-button" onClick={() => { recovering.current = true; void refresh(); }}>Retry connection</button>
   </div>;
   if (!waiting || resolved) return null;

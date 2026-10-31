@@ -3,7 +3,7 @@ import { z } from 'zod';
 const bindingStatus = z.enum(['configured', 'not_configured']);
 
 export const runtimeSchema = z.object({
-  environment: z.enum(['dev', 'test', 'production', 'unconfigured']),
+  environment: z.enum(['dev', 'test', 'staging', 'production', 'unconfigured']),
   extraction: z.enum(['unavailable', 'mock_stub']),
   tally: z.enum(['unavailable', 'mock_stub']),
 }).strict().refine((value) => ['dev', 'test'].includes(value.environment) || (value.extraction === 'unavailable' && value.tally === 'unavailable'), {

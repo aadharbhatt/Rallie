@@ -81,7 +81,7 @@ Every row's owner is **agent/unassigned** until explicitly assigned. Parent deta
 | RAL-001 | Foundation: workspace and typed boundaries | DONE | GitHub Copilot |
 | RAL-002 | Foundation: Docker local Cloudflare runtime | DONE | GitHub Copilot |
 | RAL-003 | Foundation: shell and health | DONE | GitHub Copilot |
-| RAL-004 | Foundation: environment and migration isolation | TODO | agent/unassigned |
+| RAL-004 | Foundation: environment and migration isolation | DONE | GitHub Copilot |
 | RAL-005 | Foundation: automated checks and local gate | TODO | agent/unassigned |
 | RAL-006 | Foundation: credential-gated deployment | TODO | agent/unassigned |
 | RAL-007 | Identity: library-backed authentication | TODO | agent/unassigned |
@@ -236,13 +236,13 @@ These are proposed implementation decisions, not unstated requirements from the 
 - **Evidence / notes:** [Shell/health evidence and manual validation](SHELL-HEALTH.md): 100 unit/contract tests, 27 built-asset Docker Worker browser tests, 12 repeated focus/recovery checks, real D1 replay/repeat/upgrade, isolated four-binding runtime verification, typechecks/build/audits and diff checks passed. Route-local chunk/render errors preserve the shell and retry without full reload; mobile drawer/focus, Save-Data, cold-start timeout/retry, editable/IME-safe shortcuts and shared runtime/readiness status verified. Actual API stop/restart showed unavailable then recovered without mock fallback. No migration changes; existing safe health implementation reused. 320px drawer screenshot and desktop/narrow browser inspection recorded. Build warnings/initial chunk size, physical zoom/screen-reader certification, real session/staging/deployment and persisted domain work remain explicit limitations; RAL-004–006 are not completed by this evidence.
 
 ### RAL-004 — Separate dev, staging and production resources and migrations
-- **Status:** TODO; **Owner:** agent/unassigned; **Dependencies:** RAL-002, RAL-003.
+- **Status:** DONE; **Owner:** GitHub Copilot; **Dependencies:** RAL-002, RAL-003. Started/verified 2026-10-31; uncommitted working tree based on c5e6c05, no new commit/PR; scope FND-008 and FND-010 only; local foundation completion, no live deployment.
 - **Scope:** Distinct bindings, origins and secrets for dev/staging/prod; migration conventions, deterministic seeds only in test/dev and explicit resource provisioning checklist.
 - **UI / keyboard:** Nonproduction banner; no UI-specific keyboard behavior beyond shell. Diagnostics must distinguish unprovisioned from unhealthy.
 - **API / security:** Environment-specific CORS/origin allowlists; production fails closed for missing bindings or mock flags. Avoid exposing account IDs/credentials in public health data.
 - **DB / migrations:** Empty replay and forward upgrade strategy; prohibit accidental production seeds, destructive reset and cross-environment bucket/database reuse. Document backup/restore prerequisite before destructive changes.
-- **Acceptance:** [ ] Binding tests prove isolation. [ ] Empty local D1 replay succeeds twice safely. [ ] Missing credentials produce actionable non-secret setup status, not an attempted deployment.
-- **Evidence / notes:** _Pending: environment matrix, migration output, resource IDs stored securely outside evidence._
+- **Acceptance:** [x] Binding tests prove isolation. [x] Empty local D1 replay succeeds twice safely. [x] Missing credentials produce actionable non-secret setup status, not an attempted deployment.
+- **Evidence / notes:** [Environment matrix, migration/recovery runbook, executed evidence and manual validation](ENVIRONMENTS.md); mapped children FND-008/FND-010 verified. 133 unit/contract tests, all package/tool typechecks, 2 real local D1/R2 integration tests (empty/repeat/bootstrap upgrade/ledger/sentinel restore and four-way isolated binding identities), 30 Docker built-asset Chromium tests, web build + Worker dry-run/audits and isolated four-binding Docker restart/reset/failure checks passed. Staging/production binding fixtures were synthetic and remote:false; setup checks honestly returned unprovisioned/no deployment. Exact origin/CORS policies, remote missing bindings/mock denial, claimed state roots and test-only verified recovery points enforced. No new migration, domain schema, dependency, live credential/resource ID or deployment. Actual remote config wiring, provisioning, protected deploy/live migrations/cloud recovery remain RAL-006; CI remains RAL-005. Existing build warnings, operator-attested offline recovery, no independent review/new commit and untested live integrations remain explicit limitations.
 
 ### RAL-005 — Establish CI checks and the runnable local foundation gate
 - **Status:** TODO; **Owner:** agent/unassigned; **Dependencies:** RAL-003, RAL-004.
